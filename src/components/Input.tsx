@@ -181,7 +181,7 @@ const styles = EStyleSheet.create({
     height: 50,
   },
   focused: {
-    borderColor: '#FFF',
+    borderColor: '#000000',
   },
   link: {marginLeft: 'auto'},
   top: {top: -8},
@@ -219,14 +219,14 @@ const styles = EStyleSheet.create({
     fontSize: fontPixel(12),
     lineHeight: 18,
     fontFamily: 'Roboto-Medium',
-    color: colors.White,
-    backgroundColor: colors.primary,
+    color: colors.primary,
+    backgroundColor: colors.White,
     position: 'absolute',
     paddingRight: '0.2rem',
     paddingLeft: '0.2rem',
   },
   floatingLabel: {
     fontSize: fontPixel(12),
-    color: colors.White,
+    color: colors.primary,
   },
 });

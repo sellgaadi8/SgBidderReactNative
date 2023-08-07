@@ -4,6 +4,7 @@ import React from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
 import CreatePassword from './src/views/Auth/CreatePassword';
 import Login from './src/views/Auth/Login';
+import Register from './src/views/Auth/Register';
 
 export default function App() {
   const RootStack = createStackNavigator();
@@ -16,6 +17,11 @@ export default function App() {
             options={{headerShown: false}}
             component={Login}
             name="Login"
+          />
+          <RootStack.Screen
+            options={{headerShown: false}}
+            component={Register}
+            name="Register"
           />
           <RootStack.Screen
             options={{headerShown: false}}

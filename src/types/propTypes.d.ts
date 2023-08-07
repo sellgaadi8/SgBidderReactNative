@@ -78,7 +78,14 @@ type FontSize =
   | 25
   | 34;
 
-type AppColors = 'Primary' | 'White' | 'Black' | '#000000' | '#FFFFFF';
+type AppColors =
+  | 'Primary'
+  | 'White'
+  | 'Black'
+  | '#000000'
+  | '#FFFFFF'
+  | '#111111'
+  | '#FF0000';
 
 type TextButtonProps = {
   label: string;
@@ -118,4 +125,13 @@ type PrimaryButtonProps = {
 type LoginProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Login'>;
   route: RouteProp<RootStackParamList, 'Login'>;
+};
+
+type LoaderProps = {
+  status?: string;
+};
+
+type RegisterProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'Register'>;
+  route: RouteProp<RootStackParamList, 'Register'>;
 };

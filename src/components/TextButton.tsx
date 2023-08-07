@@ -17,7 +17,7 @@ export default function TextButton({
       <TouchableOpacity onPress={onPress}>
         <CustomText
           fontSize={12}
-          color="White"
+          color="#111111"
           lineHeight={16}
           style={[styles.label, labelStyles]}>
           {label}

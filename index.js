@@ -4,13 +4,19 @@
 
 import 'react-native-gesture-handler';
 
-import {AppRegistry, StyleSheet} from 'react-native';
+import {AppRegistry, Dimensions, StyleSheet} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import store from './src/redux/store';
 import React from 'react';
 import {Provider} from 'react-redux';
+import EStyleSheet from 'react-native-extended-stylesheet';
+const {width} = Dimensions.get('screen');
+
+EStyleSheet.build({
+  $rem: width > 480 ? 16 : 10,
+});
 
 function Main() {
   return (
