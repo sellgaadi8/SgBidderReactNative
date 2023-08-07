@@ -11,6 +11,7 @@ type BoxProps = {
   flexDirection?: 'row' | 'column';
   justifyContent?: 'center' | 'space-between' | 'space-around' | 'space-evenly';
   alignItems?: 'center' | 'space-between';
+  alignSelf?: 'center';
   height?: number | string;
   width?: number | string;
   p?: Spacing;
@@ -78,3 +79,43 @@ type FontSize =
   | 34;
 
 type AppColors = 'Primary' | 'White' | 'Black' | '#000000' | '#FFFFFF';
+
+type TextButtonProps = {
+  label: string;
+  onPress?: () => void;
+  color?: string;
+  borderColor?: string;
+  fontSize?: string;
+  containerStyles?: EStyleSheet.AnyObject;
+  labelStyles?: EStyleSheet.AnyObject;
+};
+
+type InputProps = {
+  disableCopyPaste?: boolean;
+  callOnFocus?: () => any;
+  textButton?: TextButtonProps;
+  showTextButton?: boolean;
+  error?: string;
+  noMargin?: boolean;
+  endIcon?: IconDefinition;
+  endIconPress?: () => void;
+  renderEndIcon?: () => any;
+  label?: string;
+  propsStyle?: ViewStyle;
+  labelStyle?: ViewStyle;
+  input?: ViewStyle;
+};
+
+type PrimaryButtonProps = {
+  onPress: () => void;
+  label: string;
+  buttonStyle?: ViewStyle;
+  labelStyle?: EStyleSheet.AnyObject;
+  varient?: 'Primary' | 'Secondary';
+  disabled?: boolean;
+};
+
+type LoginProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'Login'>;
+  route: RouteProp<RootStackParamList, 'Login'>;
+};
