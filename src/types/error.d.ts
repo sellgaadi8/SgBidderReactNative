@@ -4,9 +4,6 @@ type LoginErrors = {
 };
 
 type RegisterErrors = {
-  name?: string;
-  email?: string;
+  otp?: string;
   phone?: string;
-  city?: string;
-  sellerType?: string;
 };

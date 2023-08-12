@@ -117,6 +117,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+             if (project.hasProperty('BIDDER_UPLOAD_STORE_FILE')) {
+                storeFile file(BIDDER_UPLOAD_STORE_FILE)
+                storePassword BIDDER_UPLOAD_STORE_PASSWORD
+                keyAlias BIDDER_UPLOAD_KEY_ALIAS
+                keyPassword BIDDER_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
@@ -168,3 +176,4 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")

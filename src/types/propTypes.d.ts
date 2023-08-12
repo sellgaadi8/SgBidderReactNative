@@ -85,7 +85,10 @@ type AppColors =
   | '#000000'
   | '#FFFFFF'
   | '#111111'
-  | '#FF0000';
+  | '#FF0000'
+  | 'rgba(157, 157, 157, 0.8)'
+  | '#5D5D5D'
+  | '#34A02C';
 
 type TextButtonProps = {
   label: string;
@@ -134,4 +137,31 @@ type LoaderProps = {
 type RegisterProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Register'>;
   route: RouteProp<RootStackParamList, 'Register'>;
+};
+
+type ForgotPasswordProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'ForgotPassword'>;
+  route: RouteProp<RootStackParamList, 'ForgotPassword'>;
+};
+
+type CreatePasswordProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'CreatePassword'>;
+  route: RouteProp<RootStackParamList, 'CreatePassword'>;
+};
+
+type TabLabelProps = {
+  value: string;
+  focused: boolean;
+};
+
+type ExploreProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'ExploreStack'>;
+  route: RouteProp<RootStackParamList, 'ExploreStack'>;
+};
+
+type VehicleCardProps = {
+  data: Vehicle;
+  onPressEdit: () => void;
+  onPressView: () => void;
+  formatTime: string;
 };

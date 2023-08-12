@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Image,
   Keyboard,
@@ -5,7 +6,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -24,16 +25,18 @@ import {onSendOtp} from '../../redux/ducks/sendOtp';
 import {useAppSelector} from '../../utils/hook';
 import Loader from '../../components/Loader';
 import {onLogin} from '../../redux/ducks/login';
+import GlobalContext from '../../contexts/GlobalContext';
 
 export default function Login({navigation}: LoginProps) {
-  const [mobile, setMobile] = useState('');
-  const [password, setPassword] = useState('123456');
+  const [mobile, setMobile] = useState('9004041287');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const [isPassword, setIsPassword] = useState(false);
   const [errors, setErrors] = useState<LoginErrors>();
   const [showOtp, setShowOtp] = useState(false);
   const selectOtp = useAppSelector(state => state.sendOtp);
   const selectLogin = useAppSelector(state => state.login);
+  const {setAuthenticated} = useContext(GlobalContext);
 
   const dispatch = useDispatch<any>();
 
@@ -46,7 +49,7 @@ export default function Login({navigation}: LoginProps) {
         dispatch(onSendOtp(mobile));
       } else {
         setLoading(true);
-        dispatch(onLogin(mobile, true, password));
+        dispatch(onLogin(mobile));
       }
     }
   }
@@ -86,15 +89,30 @@ export default function Login({navigation}: LoginProps) {
     if (selectLogin.called) {
       setLoading(false);
       const {message, success, name} = selectLogin;
-      if (success && name && message) {
+      if (success && name) {
+        setAuthenticated(true);
         Snackbar.show({
           text: message,
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });
+      } else {
+        Snackbar.show({
+          text: 'Something went wrong',
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
       }
     }
   }, [selectOtp, selectLogin]);
+
+  function onLoginWithOtp() {
+    const isValid = validateInputs();
+    if (!isPassword && isValid) {
+      dispatch(onSendOtp(mobile));
+      setIsPassword(!isPassword);
+    }
+  }
 
   return (
     <Box style={styles.container}>
@@ -105,7 +123,6 @@ export default function Login({navigation}: LoginProps) {
             <Image
               source={require('../../assets/loginCircle.png')}
               style={styles.headerBg}
-              // resizeMode=''
             />
             <Image
               source={require('../../assets/logo.png')}
@@ -119,7 +136,7 @@ export default function Login({navigation}: LoginProps) {
               fontFamily="Roboto-Bold"
               fontSize={22}
               lineHeight={28}>
-              Signup
+              Signin
             </CustomText>
             <Box style={styles.inputContainer}>
               <Input
@@ -132,22 +149,21 @@ export default function Login({navigation}: LoginProps) {
                 noMargin
                 editable={!showOtp}
               />
-              {showOtp && (
-                <Input
-                  label="Otp"
-                  showTextButton={true}
-                  value={password}
-                  onChangeText={setPassword}
-                  error={errors?.password}
-                  noMargin
-                  // textButton={{
-                  //   label: 'Login with OTP',
-                  //   containerStyles: styles.link,
-                  //   onPress: () => console.log('test'),
-                  //   labelStyles: styles.labelButton,
-                  // }}
-                />
-              )}
+
+              <Input
+                label={!isPassword ? 'Password' : 'OTP'}
+                showTextButton={true}
+                value={password}
+                onChangeText={setPassword}
+                error={errors?.password}
+                noMargin
+                textButton={{
+                  label: 'Login with OTP',
+                  containerStyles: styles.link,
+                  onPress: onLoginWithOtp,
+                  labelStyles: styles.labelButton,
+                }}
+              />
             </Box>
             <Box width={'40%'} alignSelf="center" mv={10}>
               <PrimaryButton label="Submit" onPress={onSubmit} />
@@ -193,14 +209,14 @@ const styles = EStyleSheet.create({
     position: 'relative',
   },
   headerBg: {
-    height: pixelSizeVertical(316),
-    width: pixelSizeHorizontal(352),
+    height: pixelSizeVertical(335),
+    width: pixelSizeHorizontal(375),
   },
   logo: {
-    height: pixelSizeVertical(130),
-    width: pixelSizeHorizontal(120),
+    height: pixelSizeVertical(135),
+    width: pixelSizeHorizontal(125),
     position: 'absolute',
-    bottom: 50,
+    bottom: 40,
     right: 20,
   },
   body: {

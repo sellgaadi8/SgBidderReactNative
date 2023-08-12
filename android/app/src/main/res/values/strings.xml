@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">SgBidderReactNative</string>
+	<string name="app_name">
+		Bidder App
+	</string>
 </resources>

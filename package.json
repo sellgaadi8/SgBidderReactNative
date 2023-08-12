@@ -5,6 +5,8 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "android:clear": "cd android && ./gradlew clean",
+    "android-build": "cd android && ./gradlew assembleRelease",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
@@ -18,6 +20,7 @@
     "react": "18.2.0",
     "react-native": "0.71.7",
     "react-native-extended-stylesheet": "^0.12.0",
+    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.9.0",
     "react-native-modalbox": "^2.0.2",
     "react-native-permissions": "^3.8.4",
@@ -28,6 +31,8 @@
     "react-native-sensitive-info": "^5.5.8",
     "react-native-size-matters": "^0.4.0",
     "react-native-snackbar": "^2.6.2",
+    "react-native-vector-icons": "^10.0.0",
+    "react-native-video": "^5.2.1",
     "react-redux": "^8.0.5",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2"
@@ -41,6 +46,8 @@
     "@types/jest": "^29.2.1",
     "@types/react": "^18.0.24",
     "@types/react-native-modalbox": "^1.4.10",
+    "@types/react-native-vector-icons": "^6.4.13",
+    "@types/react-native-video": "^5.0.15",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.2.1",
     "eslint": "^8.19.0",

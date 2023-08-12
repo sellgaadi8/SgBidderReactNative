@@ -160,7 +160,7 @@ export default function Input(props: TextInputProps & InputProps) {
 const styles = EStyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: hp('4%'),
+    marginBottom: hp('2%'),
     ...contentCenter,
   },
   inputContainer: {

@@ -44,6 +44,7 @@ export const onRegister =
       city: city,
       email: email,
       seller_type: seller_type,
+      role: 'bidder',
     });
 
     const config = {
