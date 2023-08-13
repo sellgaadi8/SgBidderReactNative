@@ -29,7 +29,7 @@ import GlobalContext from '../../contexts/GlobalContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Login({navigation}: LoginProps) {
-  const [mobile, setMobile] = useState('9004041287');
+  const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
