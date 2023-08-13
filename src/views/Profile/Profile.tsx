@@ -114,7 +114,7 @@ export default function Profile({navigation}: ProfileProps) {
         {Button.map((el, index) => {
           return (
             <Pressable
-              onPress={() => details(index)}
+              // onPress={() => details(index)}
               key={index.toString()}
               style={[
                 styles.button,

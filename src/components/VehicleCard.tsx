@@ -19,11 +19,11 @@ export default function VehicleCard({
   onPressEdit,
   onPressView,
 }: VehicleCardProps) {
-  const targetDate = new Date(data.auction_ends_at);
-  const now = new Date();
-  const timeDifference = targetDate.getTime() - now.getTime();
-
   const calculateRemainingTime = (timeDiff: number) => {
+    if (timeDiff <= 0) {
+      return '00:00:00';
+    }
+
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
@@ -32,11 +32,21 @@ export default function VehicleCard({
       .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const targetDateString = data.auction_ends_at || ''; // Handle null or undefined target date
+  const targetDate = new Date(targetDateString);
+  const currentTime = new Date();
+
   const [remainingTime, setRemainingTime] = useState(
-    calculateRemainingTime(timeDifference),
+    targetDateString
+      ? calculateRemainingTime(targetDate.getTime() - currentTime.getTime())
+      : '00:00:00',
   );
 
   useEffect(() => {
+    if (!targetDateString) {
+      return;
+    }
+
     const interval = setInterval(() => {
       const updatedNow = new Date();
       const updatedTimeDifference = targetDate.getTime() - updatedNow.getTime();
@@ -46,10 +56,10 @@ export default function VehicleCard({
         clearInterval(interval);
         setRemainingTime('00:00:00');
       }
-    }, 1000); // Update every second
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [targetDateString]);
 
   return (
     <Box style={styles.container}>

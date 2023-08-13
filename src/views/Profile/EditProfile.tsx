@@ -87,6 +87,7 @@ export default function EditProfile() {
           value={name}
           onChangeText={setName}
           error={errors?.name}
+          noMargin
         />
 
         <Input label="Address" value={address1} onChangeText={setAddress1} />
@@ -98,6 +99,7 @@ export default function EditProfile() {
           value={email}
           onChangeText={setEmail}
           error={errors?.email}
+          noMargin
         />
 
         <Input

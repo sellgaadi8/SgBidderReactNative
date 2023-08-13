@@ -3,8 +3,8 @@ import React from 'react';
 
 export default function Mycar() {
   return (
-    <View>
-      <Text>Mycar</Text>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <Text>Coming soon...</Text>
     </View>
   );
 }
