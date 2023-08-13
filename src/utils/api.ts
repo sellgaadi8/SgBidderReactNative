@@ -11,10 +11,10 @@ const LOGOUT_URL = '/logout';
 
 const getVehicleUrl = (
   vehicle_status: string,
-  model: string,
+  vehicle_make: string,
   vehicle_type: string,
 ) =>
-  `/vehicle/list?vehicle_status=${vehicle_status}&model=${model}&vehicle_type=${vehicle_type}`;
+  `/vehicle/list?vehicle_status=${vehicle_status}&vehicle_make=${vehicle_make}&vehicle_type=${vehicle_type}`;
 
 export {
   LOGIN_SEND_OTP,
