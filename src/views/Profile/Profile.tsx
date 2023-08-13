@@ -35,16 +35,16 @@ export default function Profile({navigation}: ProfileProps) {
   const selectLogout = useAppSelector(state => state.logout);
   const {setAuthenticated} = useContext(GlobalContext);
 
-  function details(index: number) {
-    switch (index) {
-      case 0:
-        return navigation.navigate('EditProfile');
-      case 1:
-        return navigation.navigate('CreatePassword');
-      default:
-        break;
-    }
-  }
+  // function details(index: number) {
+  //   switch (index) {
+  //     case 0:
+  //       return navigation.navigate('EditProfile');
+  //     case 1:
+  //       return navigation.navigate('CreatePassword');
+  //     default:
+  //       break;
+  //   }
+  // }
   // useEffect(() => {
   //   dispatch(onGetProfile());
   //   // eslint-disable-next-line react-hooks/exhaustive-deps

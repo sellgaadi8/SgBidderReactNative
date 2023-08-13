@@ -37,8 +37,7 @@ export default function Register({navigation}: RegisterProps) {
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState('');
   const selectLogin = useAppSelector(state => state.login);
-  const {setAuthenticated, setIsFirstTime, setUserPhone} =
-    useContext(GlobalContext);
+  const {setUserPhone} = useContext(GlobalContext);
 
   const dispatch = useDispatch<any>();
 
@@ -64,7 +63,6 @@ export default function Register({navigation}: RegisterProps) {
     if (phone.length < 10) {
       tempErrors.phone = 'Enter a valid phone';
     }
-
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   }
@@ -85,8 +83,7 @@ export default function Register({navigation}: RegisterProps) {
       setLoading(false);
       const {message, success} = selectLogin;
       if (success) {
-        setIsFirstTime(true);
-        setAuthenticated(true);
+        navigation.navigate('CreatePassword');
         Snackbar.show({
           text: message,
           backgroundColor: 'green',

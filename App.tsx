@@ -76,25 +76,10 @@ export default function App() {
                   component={ForgotPassword}
                   name="ForgotPassword"
                 />
-              </>
-            ) : (
-              <>
-                {isFirstTime && (
-                  <RootStack.Screen
-                    options={{headerShown: false}}
-                    component={CreatePassword}
-                    name="CreatePassword"
-                  />
-                )}
                 <RootStack.Screen
                   options={{headerShown: false}}
-                  component={BottomNavigation}
-                  name="BottomNavigation"
-                />
-                <RootStack.Screen
-                  options={{headerShown: false}}
-                  component={VehicleDetail}
-                  name="VehicleDetail"
+                  component={CreatePassword}
+                  name="CreatePassword"
                 />
                 <RootStack.Screen
                   options={() => {
@@ -106,6 +91,19 @@ export default function App() {
                   }}
                   component={EditProfile}
                   name="EditProfile"
+                />
+              </>
+            ) : (
+              <>
+                <RootStack.Screen
+                  options={{headerShown: false}}
+                  component={BottomNavigation}
+                  name="BottomNavigation"
+                />
+                <RootStack.Screen
+                  options={{headerShown: false}}
+                  component={VehicleDetail}
+                  name="VehicleDetail"
                 />
               </>
             )}
