@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {Image, Pressable, ScrollView, View} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Box from './Box';
 import CustomText from './CustomText';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -17,8 +18,39 @@ export default function VehicleCard({
   data,
   onPressEdit,
   onPressView,
-  formatTime,
 }: VehicleCardProps) {
+  const targetDate = new Date(data.auction_ends_at);
+  const now = new Date();
+  const timeDifference = targetDate.getTime() - now.getTime();
+
+  const calculateRemainingTime = (timeDiff: number) => {
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const [remainingTime, setRemainingTime] = useState(
+    calculateRemainingTime(timeDifference),
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedNow = new Date();
+      const updatedTimeDifference = targetDate.getTime() - updatedNow.getTime();
+      setRemainingTime(calculateRemainingTime(updatedTimeDifference));
+
+      if (updatedTimeDifference <= 0) {
+        clearInterval(interval);
+        setRemainingTime('00:00:00');
+      }
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Box style={styles.container}>
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -56,7 +88,7 @@ export default function VehicleCard({
       </ScrollView>
 
       <Box style={styles.body}>
-        <Box ph={'6%'}>
+        <Box ph={'3%'}>
           <CustomText
             fontSize={22}
             lineHeight={32}
@@ -86,7 +118,7 @@ export default function VehicleCard({
           flexDirection="row"
           justifyContent="space-between"
           pv={'3%'}
-          ph={'5%'}>
+          ph={'3%'}>
           <Box flexDirection="row">
             <MaterialCommunityIcons
               name="gas-station-outline"
@@ -135,30 +167,34 @@ export default function VehicleCard({
         </Box>
         <View style={styles.line} />
 
-        <Box flexDirection="row" pv={'5%'} justifyContent="space-around">
-          <Pressable style={styles.view} onPress={onPressView}>
-            <CustomText
-              fontSize={11}
-              lineHeight={16}
-              color="#111111"
-              fontFamily="Roboto-Medium">
-              View Details
-            </CustomText>
-          </Pressable>
-          <Pressable style={styles.edit} onPress={onPressEdit}>
-            <CustomText
-              fontSize={11}
-              lineHeight={16}
-              color="White"
-              fontFamily="Roboto-Medium">
-              Place bid
-            </CustomText>
-          </Pressable>
-        </Box>
+        {data.vehicle_status !== 'one_click_buy' && (
+          <Box>
+            <Box style={styles.customerexpected}>
+              <CustomText
+                color="#111111"
+                fontSize={14}
+                lineHeight={22}
+                fontFamily="Roboto-Medium">
+                Customer expected price: Rs.{data.auction_value}
+              </CustomText>
+            </Box>
+            <Box style={styles.highestbid}>
+              <CustomText
+                color="#FFFFFF"
+                fontSize={16}
+                lineHeight={22}
+                fontFamily="Roboto-Medium">
+                Highest Bid: Rs.10,00,000
+              </CustomText>
+            </Box>
+          </Box>
+        )}
+
         <Box
           flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center">
+          alignItems="center"
+          pv={'5%'}
+          justifyContent="space-between">
           {data.vehicle_status === 'in_auction' && (
             <Box style={styles.time}>
               <MaterialCommunityIcons
@@ -169,35 +205,48 @@ export default function VehicleCard({
               />
               <CustomText
                 color="#FF0000"
-                fontSize={18}
+                fontSize={16}
                 lineHeight={24}
                 fontFamily="Roboto-Medium">
-                {formatTime}
+                {remainingTime}
               </CustomText>
-              <Box ph={'10%'}>
-                <CustomText
-                  color="#34A02C"
-                  fontSize={18}
-                  lineHeight={24}
-                  fontFamily="Roboto-Medium">
-                  Highest Bid: 1000000
-                </CustomText>
-              </Box>
             </Box>
           )}
 
           {data.vehicle_status === 'one_click_buy' &&
             data.ocb_value.length !== 0 && (
-              <Box ph={'5%'}>
+              <Box ph={'3%'}>
                 <CustomText
                   color="#34A02C"
-                  fontSize={18}
+                  fontSize={13}
                   lineHeight={24}
                   fontFamily="Roboto-Medium">
-                  OCB Value: {data.ocb_value}
+                  Closing Price: Rs.{data.ocb_value}
                 </CustomText>
               </Box>
             )}
+          <Box flexDirection="row" ph={'1%'}>
+            <Pressable style={styles.view} onPress={onPressView}>
+              <CustomText
+                fontSize={10}
+                lineHeight={16}
+                color="#111111"
+                fontFamily="Roboto-Medium">
+                View Details
+              </CustomText>
+            </Pressable>
+            <Pressable style={styles.placebid} onPress={onPressEdit}>
+              <CustomText
+                fontSize={10}
+                lineHeight={16}
+                color="#111111"
+                fontFamily="Roboto-Medium">
+                {data.vehicle_status === 'one_click_buy'
+                  ? 'Buy Now'
+                  : ' Place bid'}
+              </CustomText>
+            </Pressable>
+          </Box>
         </Box>
       </Box>
     </Box>
@@ -213,7 +262,7 @@ const styles = EStyleSheet.create({
   line: {
     backgroundColor: '#ACACAC',
     height: '0.18rem',
-    width: '90%',
+    width: '95%',
     alignSelf: 'center',
     marginBottom: '1rem',
     top: 5,
@@ -247,22 +296,21 @@ const styles = EStyleSheet.create({
     elevation: 2,
   },
   view: {
-    padding: '0.3rem',
-    backgroundColor: '#FFFFFF',
+    padding: '0.5rem',
+    backgroundColor: colors.secondaryLight,
     borderRadius: 15,
-    width: 80,
+    width: 70,
     ...contentCenter,
-    elevation: 2,
     borderWidth: 1,
     borderColor: colors.secondaryLight,
   },
-  edit: {
-    padding: '0.3rem',
-    backgroundColor: colors.primary,
+  placebid: {
+    padding: '0.5rem',
+    backgroundColor: colors.secondary,
     borderRadius: 15,
-    width: 80,
+    width: 70,
+    marginLeft: '1.5rem',
     ...contentCenter,
-    elevation: 2,
   },
   play: {
     position: 'absolute',
@@ -285,5 +333,20 @@ const styles = EStyleSheet.create({
     // elevation: 1,
     top: 5,
     flexDirection: 'row',
+  },
+  highestbid: {
+    marginTop: '1rem',
+    marginLeft: '1rem',
+    backgroundColor: '#34A02C',
+    padding: '0.2rem',
+    paddingLeft: '1.5rem',
+    width: '75%',
+  },
+  customerexpected: {
+    marginTop: '1.5rem',
+    marginLeft: '1rem',
+    backgroundColor: colors.secondaryLight,
+    padding: '0.2rem',
+    paddingLeft: '1.5rem',
   },
 });

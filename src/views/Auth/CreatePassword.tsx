@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {Image, KeyboardAvoidingView, Pressable, ScrollView} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -11,25 +12,37 @@ import colors from '../../utils/colors';
 import Input from '../../components/Input';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import PrimaryButton from '../../components/PrimaryButton';
-// import {useDispatch} from 'react-redux';
-// import Snackbar from 'react-native-snackbar';
 import Loader from '../../components/Loader';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useDispatch} from 'react-redux';
+import {onChangePassword} from '../../redux/ducks/changePassword';
+import GlobalContext from '../../contexts/GlobalContext';
+import {useAppSelector} from '../../utils/hook';
+import Snackbar from 'react-native-snackbar';
 
 export default function CreatePassword({navigation}: CreatePasswordProps) {
-  const [phone, setPhone] = useState('');
-
+  const dispatch = useDispatch<any>();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<RegisterErrors>();
+  const [errors, setErrors] = useState<PasswordErrors>();
   const [showPass, setShowPass] = useState(false);
-  const [otp, setOtp] = useState('');
   const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const {userPhone} = useContext(GlobalContext);
+  const selectChangePassword = useAppSelector(state => state.changePassword);
 
   function validateInputs() {
-    const tempErrors: RegisterErrors = {};
+    const tempErrors: PasswordErrors = {};
 
-    if (phone.length < 10) {
-      tempErrors.phone = 'Enter a valid phone';
+    if (password.length === 0) {
+      tempErrors.password = 'Enter a valid password';
+    }
+    if (confirmPassword.length === 0) {
+      tempErrors.confirmPassword = 'Enter a valid password';
+    }
+
+    if (password !== confirmPassword) {
+      tempErrors.confirmPassword = 'password does not match';
     }
 
     setErrors(tempErrors);
@@ -37,8 +50,27 @@ export default function CreatePassword({navigation}: CreatePasswordProps) {
   }
 
   function onSubmit() {
-    // navigation.navigate('')
+    const isValid = validateInputs();
+    if (isValid) {
+      setLoading(true);
+      dispatch(onChangePassword(userPhone, password, ''));
+    }
   }
+
+  useEffect(() => {
+    if (selectChangePassword.called) {
+      setLoading(false);
+      const {success} = selectChangePassword;
+      if (success) {
+        navigation.navigate('EditProfile');
+        Snackbar.show({
+          text: 'Password created successfully',
+          backgroundColor: 'green',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+    }
+  }, [selectChangePassword]);
 
   return (
     <Box style={styles.container}>
@@ -70,9 +102,9 @@ export default function CreatePassword({navigation}: CreatePasswordProps) {
             <Box style={styles.inputContainer}>
               <Input
                 label="New Password"
-                value={phone}
-                onChangeText={setPhone}
-                error={errors?.phone}
+                value={password}
+                onChangeText={setPassword}
+                error={errors?.password}
                 maxLength={10}
                 noMargin
                 secureTextEntry={showPass ? false : true}
@@ -93,9 +125,9 @@ export default function CreatePassword({navigation}: CreatePasswordProps) {
               <Input
                 label="Confirm new password"
                 showTextButton={true}
-                value={otp}
-                onChangeText={setOtp}
-                error={errors?.otp}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                error={errors?.confirmPassword}
                 noMargin
                 secureTextEntry={showConfirmPass ? false : true}
                 renderEndIcon={() => {
@@ -159,4 +191,4 @@ const styles = EStyleSheet.create({
   },
 });
 
-//name , phone, city, email, sellertype : two three four
+//name , password, city, email, sellertype : two three four

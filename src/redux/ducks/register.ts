@@ -27,57 +27,45 @@ const registerAction = (res: RegisterState): RegisterAction => {
   return {type: REGISTER, payload: {...res, called: true}};
 };
 
-export const onRegister =
-  (
-    name: string,
-    phone: string,
-    city: string,
-    email: string,
-    seller_type: string,
-  ) =>
-  (dispatch: AppDispatch) => {
-    const url = REGISTER_USER;
+export const onRegister = (phone: string) => (dispatch: AppDispatch) => {
+  const url = REGISTER_USER;
 
-    const body = JSON.stringify({
-      name: name,
-      phone: phone,
-      city: city,
-      email: email,
-      seller_type: seller_type,
-      role: 'bidder',
-    });
+  const body = JSON.stringify({
+    phone: phone,
+    role: 'bidder',
+  });
 
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    axiosInstance
-      .post(url, body, config)
-      .then(res => {
-        dispatch(registerAction({...res.data, error: false}));
-        if (res.data.token) {
-          postAuth(res.data.token);
-        }
-      })
-      .catch(err => {
-        handleError(err, dispatch);
-        if (err?.request?._repsonse) {
-          dispatch(
-            registerAction({
-              ...JSON.parse(err.request._repsonse),
-              error: true,
-            }),
-          );
-        } else if (err?.msg || err?.message) {
-          dispatch(
-            registerAction({
-              called: true,
-              success: false,
-              message: err.message,
-            }),
-          );
-        }
-      });
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
   };
+
+  axiosInstance
+    .post(url, body, config)
+    .then(res => {
+      dispatch(registerAction({...res.data, error: false}));
+      if (res.data.token) {
+        postAuth(res.data.token);
+      }
+    })
+    .catch(err => {
+      handleError(err, dispatch);
+      if (err?.request?._repsonse) {
+        dispatch(
+          registerAction({
+            ...JSON.parse(err.request._repsonse),
+            error: true,
+          }),
+        );
+      } else if (err?.msg || err?.message) {
+        dispatch(
+          registerAction({
+            called: true,
+            success: false,
+            message: err.message,
+          }),
+        );
+      }
+    });
+};

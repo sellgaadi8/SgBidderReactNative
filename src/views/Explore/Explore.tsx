@@ -46,6 +46,7 @@ export default function Explore(props: ExploreProps) {
         </Box>
         <TopTabs tabs={tabs} activeIndex={activeIndex} />
       </Box>
+
       {activeIndex === 0 ? <LiveAuction {...props} /> : <OCB {...props} />}
     </Box>
   );
@@ -65,9 +66,9 @@ const styles = StyleSheet.create({
     // padding: 20,
   },
   inputContainer: {
-    width: '85%',
     padding: 15,
     top: 10,
+    width: '80%',
   },
   bell: {
     right: 25,

@@ -2,12 +2,30 @@ const LOGIN_SEND_OTP = '/getOtp';
 const LOGIN_SUBMIT = '/login';
 const REGISTER_USER = '/register';
 const CITY_LIST = '/getCityList';
+const MAKE_LIST = '/vehicle/make';
+const MODEL_LIST = '/vehicle/model';
+const VARIANT_LIST = '/vehicle/variant';
+const RESET_PASSWORD = '/changePassword';
+const UPDATE_PROFILE = '/updateProfileDetails';
+const LOGOUT_URL = '/logout';
+
 const getVehicleUrl = (
   vehicle_status: string,
   model: string,
-  from: string,
-  to: string,
+  vehicle_type: string,
 ) =>
-  `/vehicle/list?vehicle_status=${vehicle_status}&model=${model}&from=${from}&to=${to}`;
+  `/vehicle/list?vehicle_status=${vehicle_status}&model=${model}&vehicle_type=${vehicle_type}`;
 
-export {LOGIN_SEND_OTP, LOGIN_SUBMIT, REGISTER_USER, CITY_LIST, getVehicleUrl};
+export {
+  LOGIN_SEND_OTP,
+  LOGIN_SUBMIT,
+  REGISTER_USER,
+  CITY_LIST,
+  MAKE_LIST,
+  MODEL_LIST,
+  VARIANT_LIST,
+  RESET_PASSWORD,
+  UPDATE_PROFILE,
+  LOGOUT_URL,
+  getVehicleUrl,
+};

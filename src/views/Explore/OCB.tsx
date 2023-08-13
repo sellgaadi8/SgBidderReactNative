@@ -1,5 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {FlatList, ListRenderItemInfo} from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  ListRenderItemInfo,
+  Pressable,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {onGetVehicleList} from '../../redux/ducks/vehicleList';
@@ -8,25 +13,23 @@ import Box from '../../components/Box';
 import CustomText from '../../components/CustomText';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import VehicleCard from '../../components/VehicleCard';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Modal from 'react-native-modalbox';
+import Filter from '../../components/Filter';
+const {width} = Dimensions.get('window');
 
 export default function OCB({navigation}: ExploreProps) {
   const dispatch = useDispatch<any>();
   const selectVehicleList = useAppSelector(state => state.vechicleList);
   const [vehicleData, setVehicleData] = useState<Vehicle[]>();
-  const [remainingTime, setRemainingTime] = useState(7200); // 2 hours in seconds
+  const [showFilter, setShowFilter] = useState(false);
+  const [filter, setFilter] = useState<CarFilterType>({
+    modal: '',
+    vehicleType: '',
+  });
 
   useEffect(() => {
-    dispatch(onGetVehicleList('one_click_buy', '', '', ''));
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime(prevTime => prevTime - 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
+    dispatch(onGetVehicleList('one_click_buy', '', ''));
   }, []);
 
   useEffect(() => {
@@ -38,18 +41,24 @@ export default function OCB({navigation}: ExploreProps) {
     }
   }, [selectVehicleList]);
 
-  const formatTime = (timeInSeconds: number) => {
-    const hours = Math.floor(timeInSeconds / 3600);
-    const minutes = Math.floor((timeInSeconds % 3600) / 60);
-    const seconds = timeInSeconds % 60;
-
-    return `${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
   function onClickEdit() {
     navigation.navigate('AddVehicle', {from: 'edit'});
+  }
+
+  function onClosedFilter() {
+    setShowFilter(false);
+  }
+
+  function applyFilter(selectedFilters: CarFilterType) {
+    setFilter(selectedFilters);
+    dispatch(
+      onGetVehicleList(
+        'one_click_buy',
+        selectedFilters.modal,
+        selectedFilters.vehicleType,
+      ),
+    );
+    setShowFilter(false);
   }
 
   function renderItem({item}: ListRenderItemInfo<Vehicle>) {
@@ -63,13 +72,30 @@ export default function OCB({navigation}: ExploreProps) {
             vehicleId: item.uuid,
           })
         }
-        formatTime={formatTime(remainingTime)}
       />
     );
   }
 
   return (
     <Box>
+      <Pressable
+        style={styles.filter}
+        onPress={() => setShowFilter(!showFilter)}>
+        <CustomText
+          fontFamily="Roboto-Medium"
+          color="#201A1B"
+          fontSize={14}
+          lineHeight={16}>
+          Filters
+        </CustomText>
+        <Icon
+          name="filter-variant"
+          size={20}
+          color="#201A1B"
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{marginLeft: 5}}
+        />
+      </Pressable>
       {vehicleData?.length !== 0 ? (
         <>
           {/* {loading && <Loader />} */}
@@ -93,6 +119,19 @@ export default function OCB({navigation}: ExploreProps) {
           </CustomText>
         </Box>
       )}
+      {showFilter && (
+        <Modal
+          isOpen={showFilter}
+          onClosed={onClosedFilter}
+          style={styles.modal}
+          position="top">
+          <Filter
+            filter={{...filter}}
+            onApplyFilter={applyFilter}
+            onClosedFilter={onClosedFilter}
+          />
+        </Modal>
+      )}
     </Box>
   );
 }
@@ -108,5 +147,19 @@ const styles = EStyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modal: {
+    height: 'auto',
+    backgroundColor: '#FFFFFF',
+    width: width * 0.9,
+    borderRadius: 8,
+  },
+  filter: {
+    marginLeft: 'auto',
+    marginRight: 25,
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

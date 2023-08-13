@@ -7,7 +7,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -19,12 +19,14 @@ import colors from '../../utils/colors';
 import Input from '../../components/Input';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import PrimaryButton from '../../components/PrimaryButton';
-// import {useDispatch} from 'react-redux';
+import {useDispatch} from 'react-redux';
 // import Snackbar from 'react-native-snackbar';
 import Loader from '../../components/Loader';
 import Snackbar from 'react-native-snackbar';
 import {useAppSelector} from '../../utils/hook';
-import {onSendOtp} from '../../redux/ducks/sendOtp';
+import {onLogin} from '../../redux/ducks/login';
+import {onRegister} from '../../redux/ducks/register';
+import GlobalContext from '../../contexts/GlobalContext';
 
 export default function Register({navigation}: RegisterProps) {
   const [phone, setPhone] = useState('');
@@ -34,8 +36,11 @@ export default function Register({navigation}: RegisterProps) {
   const selectRegister = useAppSelector(state => state.register);
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState('');
+  const selectLogin = useAppSelector(state => state.login);
+  const {setAuthenticated, setIsFirstTime, setUserPhone} =
+    useContext(GlobalContext);
 
-  // const dispatch = useDispatch<any>();
+  const dispatch = useDispatch<any>();
 
   function onSubmit() {
     Keyboard.dismiss();
@@ -43,12 +48,13 @@ export default function Register({navigation}: RegisterProps) {
     const isValid = validateInputs();
     if (isValid) {
       if (!showOtp) {
-        // dispatch(onSendOtp(phone));
+        setLoading(true);
+        dispatch(onRegister(phone));
+        setUserPhone(phone);
       } else {
-        navigation.navigate('CreatePassword');
+        setLoading(true);
+        dispatch(onLogin(phone, otp, 'bidder', true, ''));
       }
-      // setLoading(true);
-      // dispatch(onRegister(name, phone, cityId, email, sellerType));
     }
   }
 
@@ -66,9 +72,21 @@ export default function Register({navigation}: RegisterProps) {
   useEffect(() => {
     if (selectRegister.called) {
       setLoading(false);
-      navigation.navigate('Login');
       const {message, success} = selectRegister;
       if (success) {
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'green',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+    }
+    if (selectLogin.called) {
+      setLoading(false);
+      const {message, success} = selectLogin;
+      if (success) {
+        setIsFirstTime(true);
+        setAuthenticated(true);
         Snackbar.show({
           text: message,
           backgroundColor: 'green',

@@ -27,49 +27,59 @@ const loginAction = (res: LoginState): LoginAction => {
   return {type: LOGIN, payload: {...res, called: true}};
 };
 
-export const onLogin = (phone: string) => (dispatch: AppDispatch) => {
-  const url = LOGIN_SUBMIT;
+export const onLogin =
+  (
+    phone: string,
+    otp: string,
+    role: string,
+    isOtp: boolean,
+    password: string,
+  ) =>
+  (dispatch: AppDispatch) => {
+    const url = LOGIN_SUBMIT;
 
-  const body = new FormData();
-
-  body.append('phone', phone);
-
-  body.append('role', 'bidder');
-
-  const config = {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  };
-
-  axiosInstance
-    .post(url, body, config)
-    .then(res => {
-      dispatch(loginAction({...res.data, error: false}));
-      if (res.data.token) {
-        postAuth(res.data.token);
-      }
-    })
-    .catch(err => {
-      handleError(err, dispatch);
-      if (err?.request?._repsonse) {
-        dispatch(
-          loginAction({
-            ...JSON.parse(err.request._repsonse),
-            error: true,
-          }),
-        );
-      } else if (err?.msg || err?.message) {
-        dispatch(
-          loginAction({
-            error: true,
-            called: true,
-            success: false,
-            message: err.message,
-            name: null,
-            token: null,
-          }),
-        );
-      }
+    const body = JSON.stringify({
+      phone: phone,
+      otp: otp,
+      role: role,
+      isOtp: isOtp,
+      password: password,
     });
-};
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    axiosInstance
+      .post(url, body, config)
+      .then(res => {
+        dispatch(loginAction({...res.data, error: false}));
+        if (res.data.token) {
+          postAuth(res.data.token);
+        }
+      })
+      .catch(err => {
+        // handleError(err, dispatch);
+        if (err?.request?._repsonse) {
+          dispatch(
+            loginAction({
+              ...JSON.parse(err.request._repsonse),
+              error: true,
+            }),
+          );
+        } else if (err?.msg || err?.message) {
+          dispatch(
+            loginAction({
+              error: true,
+              called: true,
+              success: false,
+              message: err.message,
+              name: null,
+              token: null,
+            }),
+          );
+        }
+      });
+  };

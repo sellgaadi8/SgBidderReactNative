@@ -26,6 +26,7 @@ import {useAppSelector} from '../../utils/hook';
 import Loader from '../../components/Loader';
 import {onLogin} from '../../redux/ducks/login';
 import GlobalContext from '../../contexts/GlobalContext';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Login({navigation}: LoginProps) {
   const [mobile, setMobile] = useState('9004041287');
@@ -36,7 +37,8 @@ export default function Login({navigation}: LoginProps) {
   const [showOtp, setShowOtp] = useState(false);
   const selectOtp = useAppSelector(state => state.sendOtp);
   const selectLogin = useAppSelector(state => state.login);
-  const {setAuthenticated} = useContext(GlobalContext);
+  const [showPass, setShowPass] = useState(false);
+  const {setAuthenticated, setIsFirstTime} = useContext(GlobalContext);
 
   const dispatch = useDispatch<any>();
 
@@ -46,10 +48,10 @@ export default function Login({navigation}: LoginProps) {
     if (isValid) {
       if (!showOtp) {
         setLoading(true);
-        dispatch(onSendOtp(mobile));
+        dispatch(onLogin(mobile, '', 'bidder', false, password));
       } else {
         setLoading(true);
-        dispatch(onLogin(mobile));
+        dispatch(onLogin(mobile, password, 'bidder', true, ''));
       }
     }
   }
@@ -62,6 +64,9 @@ export default function Login({navigation}: LoginProps) {
     }
     if (showOtp && password.length === 0) {
       tempErrors.password = 'Enter a valid Otp';
+    }
+    if (!showOtp && password.length === 0) {
+      tempErrors.password = 'Enter a valid Password';
     }
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -90,6 +95,7 @@ export default function Login({navigation}: LoginProps) {
       setLoading(false);
       const {message, success, name} = selectLogin;
       if (success && name) {
+        setIsFirstTime(false);
         setAuthenticated(true);
         Snackbar.show({
           text: message,
@@ -107,10 +113,17 @@ export default function Login({navigation}: LoginProps) {
   }, [selectOtp, selectLogin]);
 
   function onLoginWithOtp() {
-    const isValid = validateInputs();
-    if (!isPassword && isValid) {
+    setShowPass(true);
+    setPassword('');
+    if (mobile.length !== 0) {
       dispatch(onSendOtp(mobile));
       setIsPassword(!isPassword);
+    } else {
+      Snackbar.show({
+        text: 'Enter mobile number first',
+        backgroundColor: 'red',
+        duration: Snackbar.LENGTH_SHORT,
+      });
     }
   }
 
@@ -163,6 +176,24 @@ export default function Login({navigation}: LoginProps) {
                   onPress: onLoginWithOtp,
                   labelStyles: styles.labelButton,
                 }}
+                secureTextEntry={showPass ? false : true}
+                renderEndIcon={
+                  !isPassword
+                    ? () => {
+                        return (
+                          <Pressable
+                            onPress={() => setShowPass(!showPass)}
+                            style={styles.eye}>
+                            <Icon
+                              name={showPass ? 'eye' : 'eye-off'}
+                              size={18}
+                              color="#111111"
+                            />
+                          </Pressable>
+                        );
+                      }
+                    : undefined
+                }
               />
             </Box>
             <Box width={'40%'} alignSelf="center" mv={10}>
@@ -225,5 +256,10 @@ const styles = EStyleSheet.create({
   },
   inputContainer: {
     marginTop: '4rem',
+  },
+  eye: {
+    position: 'absolute',
+    right: 20,
+    top: 18,
   },
 });

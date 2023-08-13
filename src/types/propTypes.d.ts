@@ -88,7 +88,10 @@ type AppColors =
   | '#FF0000'
   | 'rgba(157, 157, 157, 0.8)'
   | '#5D5D5D'
-  | '#34A02C';
+  | '#34A02C'
+  | '#201A1B'
+  | '#1C1B1F'
+  | '#49454F';
 
 type TextButtonProps = {
   label: string;
@@ -163,5 +166,66 @@ type VehicleCardProps = {
   data: Vehicle;
   onPressEdit: () => void;
   onPressView: () => void;
-  formatTime: string;
+};
+
+type CustomDropdownProps = {
+  title?: string;
+  selectedValue: any;
+  onValueChange: (value: any, index: number) => void;
+  values: {label: string; value: any}[];
+  mode?: 'dialog' | 'dropdown';
+  error?: string;
+  isMandatory?: boolean;
+};
+
+type ModalType = 'Make' | 'Model' | 'Variant';
+
+type SearchModalProps = {
+  placeholder: string;
+  data: string[];
+  onPressSelecteItem: (selected: string, modalType: ModalType) => void;
+  dataType: ModalType;
+  query: string;
+  onChangeText: (value: string) => void;
+  onPressDone: () => void;
+  showDone?: boolean;
+};
+
+type CalenderProps = {
+  isOpen: boolean;
+  onClosed: () => void;
+  onChange: (event: Event | DateTimePickerEvent, date?: Date) => void;
+  value: Date;
+  maximumDate?: Date;
+  minimumDate?: Date;
+};
+
+type SplashProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'Splash'>;
+};
+
+type ProfileProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'Profile'>;
+};
+
+type HeaderProps = {
+  headerProps: HeaderOptions;
+  title?: string;
+  back?: boolean;
+  showIcon?: boolean;
+};
+
+type EditProfileProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'EditProfile'>;
+};
+
+type CarFilterType = {
+  modal: string;
+  vehicleType: string;
+};
+
+type FilterProps = {
+  onClosedFilter: () => void;
+  onApplyFilter: (filters: CarFilterType) => void;
+  filter: CarFilterType;
 };

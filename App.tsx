@@ -1,6 +1,7 @@
+/* eslint-disable react/no-unstable-nested-components */
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
 import CreatePassword from './src/views/Auth/CreatePassword';
 import Login from './src/views/Auth/Login';
@@ -8,21 +9,58 @@ import Register from './src/views/Auth/Register';
 import ForgotPassword from './src/views/Auth/ForgotPassword';
 import GlobalContext from './src/contexts/GlobalContext';
 import BottomNavigation from './src/navigation/BottomNavigation';
+import VehicleDetail from './src/views/Explore/VehicleDetail';
+import EditProfile from './src/views/Profile/EditProfile';
+import Splash from './src/views/Splash/Splash';
+import {useAppSelector} from './src/utils/hook';
+import {deleteUserToken} from './src/utils/localStorage';
+import Snackbar from 'react-native-snackbar';
+import Header from './src/components/Header';
 
 export default function App() {
   const RootStack = createStackNavigator();
   const [authenticated, setAuthenticated] = useState(false);
+  const [isFirstTime, setIsFirstTime] = useState(false);
+  const [userPhone, setUserPhone] = useState('');
+  const selectLogoutState = useAppSelector(state => state.logout);
+
+  console.log('isFirstTime', isFirstTime);
+
+  useEffect(() => {
+    if (selectLogoutState.called) {
+      const {error, message} = selectLogoutState;
+      if (!error && message) {
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+        setAuthenticated(false);
+      } else {
+        deleteUserToken();
+        setAuthenticated(false);
+      }
+    }
+  }, [selectLogoutState]);
 
   return (
     <GlobalContext.Provider
       value={{
         setAuthenticated,
+        setIsFirstTime,
+        setUserPhone,
+        userPhone,
       }}>
       <SafeAreaView style={styles.container}>
         <NavigationContainer>
           <RootStack.Navigator>
             {!authenticated ? (
               <>
+                <RootStack.Screen
+                  options={{headerShown: false}}
+                  component={Splash}
+                  name="Splash"
+                />
                 <RootStack.Screen
                   options={{headerShown: false}}
                   component={Login}
@@ -38,24 +76,37 @@ export default function App() {
                   component={ForgotPassword}
                   name="ForgotPassword"
                 />
-                <RootStack.Screen
-                  options={{headerShown: false}}
-                  component={CreatePassword}
-                  name="CreatePassword"
-                />
               </>
             ) : (
               <>
+                {isFirstTime && (
+                  <RootStack.Screen
+                    options={{headerShown: false}}
+                    component={CreatePassword}
+                    name="CreatePassword"
+                  />
+                )}
                 <RootStack.Screen
                   options={{headerShown: false}}
                   component={BottomNavigation}
                   name="BottomNavigation"
                 />
-                {/* <RootStack.Screen
+                <RootStack.Screen
                   options={{headerShown: false}}
-                  component={Welcome}
-                  name="Welcome"
-                /> */}
+                  component={VehicleDetail}
+                  name="VehicleDetail"
+                />
+                <RootStack.Screen
+                  options={() => {
+                    return {
+                      header: props => (
+                        <Header title="Update Profile" headerProps={props} />
+                      ),
+                    };
+                  }}
+                  component={EditProfile}
+                  name="EditProfile"
+                />
               </>
             )}
           </RootStack.Navigator>

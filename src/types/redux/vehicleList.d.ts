@@ -15,6 +15,8 @@ type Vehicle = {
   images: string[];
   vehicle_status: string;
   ocb_value: string;
+  auction_value: string;
+  auction_ends_at: string;
 };
 
 type VehicleListState = {
