@@ -61,7 +61,7 @@ export const onLogin =
         }
       })
       .catch(err => {
-        // handleError(err, dispatch);
+        handleError(err, dispatch);
         if (err?.request?._repsonse) {
           dispatch(
             loginAction({

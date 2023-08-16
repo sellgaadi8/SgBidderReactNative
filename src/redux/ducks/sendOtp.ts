@@ -37,6 +37,7 @@ export const onSendOtp = (phone: string) => (dispatch: AppDispatch) => {
   const body = new FormData();
 
   body.append('phone', phone);
+  body.append('role', 'bidder');
 
   axiosInstance
     .post(url, body, config)
