@@ -7,6 +7,7 @@ type LoginState = {
   error: boolean;
   name: string | null;
   token: string | null;
+  is_register: number | null;
 };
 
 type LoginAction = {

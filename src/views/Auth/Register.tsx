@@ -83,7 +83,7 @@ export default function Register({navigation}: RegisterProps) {
       setLoading(false);
       const {message, success} = selectLogin;
       if (success) {
-        navigation.navigate('CreatePassword');
+        // navigation.navigate('CreatePassword');
         Snackbar.show({
           text: message,
           backgroundColor: 'green',

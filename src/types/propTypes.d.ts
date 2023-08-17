@@ -147,10 +147,10 @@ type ForgotPasswordProps = {
   route: RouteProp<RootStackParamList, 'ForgotPassword'>;
 };
 
-type CreatePasswordProps = {
-  navigation: StackNavigationProp<RootStackParamList, 'CreatePassword'>;
-  route: RouteProp<RootStackParamList, 'CreatePassword'>;
-};
+// type CreatePasswordProps = {
+//   navigation: StackNavigationProp<RootStackParamList, 'CreatePassword'>;
+//   route: RouteProp<RootStackParamList, 'CreatePassword'>;
+// };
 
 type TabLabelProps = {
   value: string;

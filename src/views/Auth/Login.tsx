@@ -1,11 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Pressable,
-  ScrollView,
-} from 'react-native';
+import {Image, Keyboard, KeyboardAvoidingView, ScrollView} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {
   heightPercentageToDP as hp,
@@ -26,19 +20,18 @@ import {useAppSelector} from '../../utils/hook';
 import Loader from '../../components/Loader';
 import {onLogin} from '../../redux/ducks/login';
 import GlobalContext from '../../contexts/GlobalContext';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Login({navigation}: LoginProps) {
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isPassword, setIsPassword] = useState(false);
+  // const [isPassword, setIsPassword] = useState(false);
   const [errors, setErrors] = useState<LoginErrors>();
   const [showOtp, setShowOtp] = useState(false);
   const selectOtp = useAppSelector(state => state.sendOtp);
   const selectLogin = useAppSelector(state => state.login);
-  const [showPass, setShowPass] = useState(false);
-  const {setAuthenticated, setIsFirstTime} = useContext(GlobalContext);
+  const {setAuthenticated, setIsFirstTime, setUserPhone} =
+    useContext(GlobalContext);
 
   const dispatch = useDispatch<any>();
 
@@ -48,7 +41,7 @@ export default function Login({navigation}: LoginProps) {
     if (isValid) {
       if (!showOtp) {
         setLoading(true);
-        dispatch(onLogin(mobile, '', 'bidder', false, password));
+        dispatch(onSendOtp(mobile));
       } else {
         setLoading(true);
         dispatch(onLogin(mobile, password, 'bidder', true, ''));
@@ -65,9 +58,7 @@ export default function Login({navigation}: LoginProps) {
     if (showOtp && password.length === 0) {
       tempErrors.password = 'Enter a valid Otp';
     }
-    if (!showOtp && password.length === 0) {
-      tempErrors.password = 'Enter a valid Password';
-    }
+
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   }
@@ -93,8 +84,8 @@ export default function Login({navigation}: LoginProps) {
     }
     if (selectLogin.called) {
       setLoading(false);
-      const {message, success, name} = selectLogin;
-      if (success && name) {
+      const {message, success, is_register} = selectLogin;
+      if (success && is_register === 0) {
         setIsFirstTime(false);
         setAuthenticated(true);
         Snackbar.show({
@@ -102,9 +93,12 @@ export default function Login({navigation}: LoginProps) {
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });
-      } else {
+      } else if (is_register === 1) {
+        setUserPhone(mobile);
+        navigation.navigate('EditProfile');
+      } else if (!success) {
         Snackbar.show({
-          text: 'Something went wrong',
+          text: message,
           backgroundColor: 'red',
           duration: Snackbar.LENGTH_SHORT,
         });
@@ -112,19 +106,24 @@ export default function Login({navigation}: LoginProps) {
     }
   }, [selectOtp, selectLogin]);
 
-  function onLoginWithOtp() {
-    setShowPass(true);
+  // function onLoginWithOtp() {
+  //   setShowPass(true);
+  //   setPassword('');
+  //   if (mobile.length !== 0) {
+  //     dispatch(onSendOtp(mobile));
+  //     setIsPassword(!isPassword);
+  //   } else {
+  //     Snackbar.show({
+  //       text: 'Enter mobile number first',
+  //       backgroundColor: 'red',
+  //       duration: Snackbar.LENGTH_SHORT,
+  //     });
+  //   }
+  // }
+
+  function onEdit() {
+    setShowOtp(false);
     setPassword('');
-    if (mobile.length !== 0) {
-      dispatch(onSendOtp(mobile));
-      setIsPassword(!isPassword);
-    } else {
-      Snackbar.show({
-        text: 'Enter mobile number first',
-        backgroundColor: 'red',
-        duration: Snackbar.LENGTH_SHORT,
-      });
-    }
   }
 
   return (
@@ -163,44 +162,32 @@ export default function Login({navigation}: LoginProps) {
                 editable={!showOtp}
               />
 
-              <Input
-                label={!isPassword ? 'Password' : 'OTP'}
-                showTextButton={true}
-                value={password}
-                onChangeText={setPassword}
-                error={errors?.password}
-                noMargin
-                textButton={{
-                  label: 'Login with OTP',
-                  containerStyles: styles.link,
-                  onPress: onLoginWithOtp,
-                  labelStyles: styles.labelButton,
-                }}
-                secureTextEntry={showPass ? false : true}
-                renderEndIcon={
-                  !isPassword
-                    ? () => {
-                        return (
-                          <Pressable
-                            onPress={() => setShowPass(!showPass)}
-                            style={styles.eye}>
-                            <Icon
-                              name={showPass ? 'eye' : 'eye-off'}
-                              size={18}
-                              color="#111111"
-                            />
-                          </Pressable>
-                        );
-                      }
-                    : undefined
-                }
-              />
+              {showOtp && (
+                <Input
+                  label="OTP"
+                  showTextButton={true}
+                  value={password}
+                  keyboardType="numeric"
+                  onChangeText={setPassword}
+                  error={errors?.password}
+                  maxLength={6}
+                  noMargin
+                  textButton={{
+                    label: 'Edit',
+                    containerStyles: styles.link,
+                    onPress: onEdit,
+                  }}
+                />
+              )}
             </Box>
             <Box width={'40%'} alignSelf="center" mv={10}>
-              <PrimaryButton label="Submit" onPress={onSubmit} />
+              <PrimaryButton
+                label={showOtp ? 'Submit' : 'Get Otp'}
+                onPress={onSubmit}
+              />
             </Box>
 
-            <Box flexDirection="row" justifyContent="center" pv={'2%'}>
+            {/* <Box flexDirection="row" justifyContent="center" pv={'2%'}>
               <CustomText
                 color="#111111"
                 fontFamily="Roboto-Regular"
@@ -219,7 +206,7 @@ export default function Login({navigation}: LoginProps) {
                   Register
                 </CustomText>
               </Pressable>
-            </Box>
+            </Box> */}
           </Box>
           <Box alignItems="center" mv={'7.5%'}>
             <TextButton

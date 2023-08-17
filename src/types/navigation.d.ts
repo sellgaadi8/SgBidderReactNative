@@ -1,7 +1,7 @@
 type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
-  CreatePassword: undefined;
+  // CreatePassword: undefined;
   Register: undefined;
   ForgotPassword: undefined;
   BottomNavigation: undefined;
