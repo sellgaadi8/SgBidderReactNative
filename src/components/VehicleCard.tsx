@@ -16,7 +16,7 @@ const {height, width} = Dimensions.get('window');
 
 export default function VehicleCard({
   data,
-  onPressEdit,
+  onPlaceBid,
   onPressView,
 }: VehicleCardProps) {
   const calculateRemainingTime = (timeDiff: number) => {
@@ -245,7 +245,7 @@ export default function VehicleCard({
                 View Details
               </CustomText>
             </Pressable>
-            <Pressable style={styles.placebid} onPress={onPressEdit}>
+            <Pressable style={styles.placebid} onPress={onPlaceBid}>
               <CustomText
                 fontSize={10}
                 lineHeight={16}

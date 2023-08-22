@@ -16,6 +16,10 @@ import VehicleCard from '../../components/VehicleCard';
 import Filter from '../../components/Filter';
 import Modal from 'react-native-modalbox';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Input from '../../components/Input';
+import PrimaryButton from '../../components/PrimaryButton';
+import {onPlaceVehicleBid} from '../../redux/ducks/placebid';
+import Snackbar from 'react-native-snackbar';
 const {width} = Dimensions.get('window');
 
 export default function LiveAuction({navigation}: ExploreProps) {
@@ -23,10 +27,15 @@ export default function LiveAuction({navigation}: ExploreProps) {
   const selectVehicleList = useAppSelector(state => state.vechicleList);
   const [vehicleData, setVehicleData] = useState<Vehicle[]>();
   const [showFilter, setShowFilter] = useState(false);
+  const [showBidModal, setShowBidModal] = useState(false);
+  const [id, setId] = useState('');
+  const [amount, setAmount] = useState('');
   const [filter, setFilter] = useState<CarFilterType>({
     modal: '',
     vehicleType: '',
   });
+
+  const selectOnBid = useAppSelector(state => state.placebid);
 
   useEffect(() => {
     dispatch(onGetVehicleList('in_auction', '', ''));
@@ -43,8 +52,9 @@ export default function LiveAuction({navigation}: ExploreProps) {
     }
   }, [selectVehicleList]);
 
-  function onClickEdit() {
-    navigation.navigate('AddVehicle', {from: 'edit'});
+  function onPlaceBid(vid: string) {
+    setId(vid);
+    setShowBidModal(true);
   }
 
   function onClosedFilter() {
@@ -67,7 +77,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
     return (
       <VehicleCard
         data={item}
-        onPressEdit={() => onClickEdit()}
+        onPlaceBid={() => onPlaceBid(item.uuid)}
         onPressView={() =>
           navigation.navigate('VehicleDetail', {
             title: item.model,
@@ -77,6 +87,43 @@ export default function LiveAuction({navigation}: ExploreProps) {
       />
     );
   }
+
+  function onCloseBidModal() {
+    setShowBidModal(false);
+  }
+
+  function onSubmitBid() {
+    if (+amount > 1000) {
+      dispatch(onPlaceVehicleBid(id, amount));
+    } else {
+      Snackbar.show({
+        text: 'Please enter a valid bid amount',
+        backgroundColor: 'red',
+        duration: Snackbar.LENGTH_SHORT,
+      });
+    }
+  }
+
+  useEffect(() => {
+    if (selectOnBid.called) {
+      const {message, success} = selectOnBid;
+      if (success) {
+        setShowBidModal(false);
+        setAmount('');
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'green',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      } else {
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+    }
+  }, [selectOnBid]);
 
   return (
     <Box>
@@ -134,6 +181,23 @@ export default function LiveAuction({navigation}: ExploreProps) {
           />
         </Modal>
       )}
+      <Modal
+        isOpen={showBidModal}
+        onClosed={onCloseBidModal}
+        style={styles.modal}
+        position="top">
+        <Box style={styles.bid}>
+          <Input
+            value={amount}
+            onChangeText={setAmount}
+            label="Bid Value"
+            keyboardType="numeric"
+          />
+          <Box>
+            <PrimaryButton label="Bid" onPress={onSubmitBid} />
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 }
@@ -163,5 +227,8 @@ const styles = EStyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bid: {
+    padding: '2rem',
   },
 });

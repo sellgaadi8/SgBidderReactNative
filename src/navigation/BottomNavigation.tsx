@@ -11,7 +11,7 @@ import {contentCenter} from '../utils/styles';
 import {useAppSelector} from '../utils/hook';
 import TabLabel from '../components/TabLabel';
 import ExploreStack from './stacks/ExploreStack';
-import MyCarStack from './stacks/MyCarStack';
+// import MyCarStack from './stacks/MyCarStack';
 import OrderStack from './stacks/OrderStack';
 import ProfileStack from './stacks/ProfileStack';
 
@@ -57,7 +57,7 @@ export default function BottomNavigation() {
         name="ExploreStack"
         component={ExploreStack}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         listeners={{
           tabPress: selectGlobalState.isFormEdited
             ? e => {
@@ -84,7 +84,7 @@ export default function BottomNavigation() {
         }}
         name="MyCarStack"
         component={MyCarStack}
-      />
+      /> */}
       <Tab.Screen
         options={{
           tabBarLabel: ({focused}) => (

@@ -16,6 +16,9 @@ import VehicleCard from '../../components/VehicleCard';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modalbox';
 import Filter from '../../components/Filter';
+import {onOCB} from '../../redux/ducks/oneClickBuy';
+import Snackbar from 'react-native-snackbar';
+import Loader from '../../components/Loader';
 const {width} = Dimensions.get('window');
 
 export default function OCB({navigation}: ExploreProps) {
@@ -27,13 +30,17 @@ export default function OCB({navigation}: ExploreProps) {
     modal: '',
     vehicleType: '',
   });
+  const [loading, setLoading] = useState(false);
+  const selectOcb = useAppSelector(state => state.oneClickBuy);
 
   useEffect(() => {
+    setLoading(true);
     dispatch(onGetVehicleList('one_click_buy', '', ''));
   }, []);
 
   useEffect(() => {
     if (selectVehicleList.called) {
+      setLoading(false);
       const {data, error} = selectVehicleList;
       if (!error && data) {
         setVehicleData(data);
@@ -41,15 +48,12 @@ export default function OCB({navigation}: ExploreProps) {
     }
   }, [selectVehicleList]);
 
-  function onClickEdit() {
-    navigation.navigate('AddVehicle', {from: 'edit'});
-  }
-
   function onClosedFilter() {
     setShowFilter(false);
   }
 
   function applyFilter(selectedFilters: CarFilterType) {
+    setLoading(true);
     setFilter(selectedFilters);
     dispatch(
       onGetVehicleList(
@@ -61,11 +65,37 @@ export default function OCB({navigation}: ExploreProps) {
     setShowFilter(false);
   }
 
+  function onPlaceBid(vid: string) {
+    setLoading(true);
+    dispatch(onOCB(vid));
+  }
+
+  useEffect(() => {
+    if (selectOcb.called) {
+      setLoading(false);
+      const {success, message} = selectOcb;
+      if (success) {
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'green',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+        dispatch(onGetVehicleList('one_click_buy', '', ''));
+      } else {
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+    }
+  }, [selectOcb]);
+
   function renderItem({item}: ListRenderItemInfo<Vehicle>) {
     return (
       <VehicleCard
         data={item}
-        onPressEdit={() => onClickEdit()}
+        onPlaceBid={() => onPlaceBid(item.uuid)}
         onPressView={() =>
           navigation.navigate('VehicleDetail', {
             title: item.model,
@@ -78,6 +108,7 @@ export default function OCB({navigation}: ExploreProps) {
 
   return (
     <Box>
+      {loading && <Loader />}
       <Pressable
         style={styles.filter}
         onPress={() => setShowFilter(!showFilter)}>

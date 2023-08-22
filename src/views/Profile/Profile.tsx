@@ -20,43 +20,46 @@ import GlobalContext from '../../contexts/GlobalContext';
 import {deleteUserToken, saveTokenValidity} from '../../utils/localStorage';
 import Globals from '../../utils/globals';
 import {useAppSelector} from '../../utils/hook';
+import {onGetProfile} from '../../redux/ducks/getProfile';
 
 const Button = [
   {name: 'Personal details', detail: 'Edit & review personal details'},
-  {name: 'Change password', detail: 'Reset password details'},
   {name: 'Company details', detail: ''},
   {name: 'Support', detail: ''},
 ];
 
 export default function Profile({navigation}: ProfileProps) {
   const dispatch = useDispatch<any>();
-  // const [profileDetail, setProfleDetail] = useState<Profile>();
+  const selectGetProfile = useAppSelector(state => state.getProfile);
+  const [profileDetail, setProfleDetail] = useState<Profile>();
   const [loading, setLoading] = useState(false);
   const selectLogout = useAppSelector(state => state.logout);
   const {setAuthenticated} = useContext(GlobalContext);
 
-  // function details(index: number) {
-  //   switch (index) {
-  //     case 0:
-  //       return navigation.navigate('EditProfile');
-  //     case 1:
-  //       return navigation.navigate('CreatePassword');
-  //     default:
-  //       break;
-  //   }
-  // }
-  // useEffect(() => {
-  //   dispatch(onGetProfile());
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  function details(index: number) {
+    if (profileDetail?.dealership_name) {
+      switch (index) {
+        case 0:
+          return navigation.navigate('EditProfile', {
+            title: profileDetail?.dealership_name,
+          });
+        default:
+          break;
+      }
+    }
+  }
+  useEffect(() => {
+    dispatch(onGetProfile());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    // if (selectGetProfile.called) {
-    //   const {data, success} = selectGetProfile;
-    //   if (success && data) {
-    //     setProfleDetail(data);
-    //   }
-    // }
+    if (selectGetProfile.called) {
+      const {data, success} = selectGetProfile;
+      if (success && data) {
+        setProfleDetail(data);
+      }
+    }
     if (selectLogout.called) {
       setLoading(false);
       const {success, message} = selectLogout;
@@ -73,7 +76,7 @@ export default function Profile({navigation}: ProfileProps) {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectLogout]);
+  }, [selectGetProfile, selectLogout]);
 
   function onLogoutClick() {
     showAlert(
@@ -99,14 +102,14 @@ export default function Profile({navigation}: ProfileProps) {
             fontSize={24}
             lineHeight={32}
             fontFamily="Roboto-Regular">
-            Dummy
+            {profileDetail?.dealership_name}
           </CustomText>
           <CustomText
             color="#201A1B"
             fontSize={14}
             lineHeight={20}
             fontFamily="Roboto-Regular">
-            1234567890
+            {profileDetail?.mobile}
           </CustomText>
         </Box>
       </Box>
@@ -119,7 +122,7 @@ export default function Profile({navigation}: ProfileProps) {
               style={[
                 styles.button,
                 {
-                  padding: index >= 2 ? 20 : 10,
+                  padding: 15,
                   paddingHorizontal: 20,
                 },
               ]}>

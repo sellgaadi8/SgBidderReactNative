@@ -164,7 +164,7 @@ type ExploreProps = {
 
 type VehicleCardProps = {
   data: Vehicle;
-  onPressEdit: () => void;
+  onPlaceBid: () => void;
   onPressView: () => void;
 };
 
@@ -228,4 +228,23 @@ type FilterProps = {
   onClosedFilter: () => void;
   onApplyFilter: (filters: CarFilterType) => void;
   filter: CarFilterType;
+};
+
+type VideoPlayerProps = {
+  video: string;
+  onPressClose: () => void;
+};
+
+type TyresImagesProps = {
+  title: string;
+  value: string | null;
+  image?: string | null;
+  video?: string | null;
+  onPressImage?: () => void;
+  onPressVideo?: (value: any) => void;
+};
+
+type VehicleDetailProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'VehicleDetail'>;
+  route: RouteProp<RootStackParamList, 'VehicleDetail'>;
 };

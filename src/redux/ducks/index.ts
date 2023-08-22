@@ -12,6 +12,10 @@ import getVariant from './getVariant';
 import changePassword from './changePassword';
 import updateProfile from './updateProfile';
 import logout from './logout';
+import getVehicleDetails from './getVehicleDetails';
+import getProfile from './getProfile';
+import placebid from './placebid';
+import oneClickBuy from './oneClickBuy';
 
 export default combineReducers({
   login,
@@ -26,4 +30,8 @@ export default combineReducers({
   changePassword,
   updateProfile,
   logout,
+  getVehicleDetails,
+  getProfile,
+  placebid,
+  oneClickBuy,
 });

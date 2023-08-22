@@ -8,6 +8,9 @@ const VARIANT_LIST = '/vehicle/variant';
 const RESET_PASSWORD = '/changePassword';
 const UPDATE_PROFILE = '/updateProfileDetails';
 const LOGOUT_URL = '/logout';
+const GET_PROFILE = '/getProfileDetails';
+const PLACE_BID_URL = '/place_bid';
+const OCB_URL = '/buy_now';
 
 const getVehicleUrl = (
   vehicle_status: string,
@@ -15,6 +18,8 @@ const getVehicleUrl = (
   vehicle_type: string,
 ) =>
   `/vehicle/list?vehicle_status=${vehicle_status}&vehicle_make=${vehicle_make}&vehicle_type=${vehicle_type}`;
+
+const getVehicleDetailsUrl = (id: string) => `/vehicle/getVehicleDetails/${id}`;
 
 export {
   LOGIN_SEND_OTP,
@@ -27,5 +32,9 @@ export {
   RESET_PASSWORD,
   UPDATE_PROFILE,
   LOGOUT_URL,
+  GET_PROFILE,
+  PLACE_BID_URL,
+  OCB_URL,
   getVehicleUrl,
+  getVehicleDetailsUrl,
 };
