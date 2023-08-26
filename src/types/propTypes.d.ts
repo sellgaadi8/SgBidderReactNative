@@ -88,7 +88,7 @@ type AppColors =
   | '#FF0000'
   | 'rgba(157, 157, 157, 0.8)'
   | '#5D5D5D'
-  | '#34A02C'
+  | '#33A02C'
   | '#201A1B'
   | '#1C1B1F'
   | '#49454F';
@@ -164,8 +164,9 @@ type ExploreProps = {
 
 type VehicleCardProps = {
   data: Vehicle;
-  onPlaceBid: () => void;
+  onPlaceBid?: () => void;
   onPressView: () => void;
+  isOrder?: boolean;
 };
 
 type CustomDropdownProps = {
@@ -247,4 +248,9 @@ type TyresImagesProps = {
 type VehicleDetailProps = {
   navigation: StackNavigationProp<RootStackParamList, 'VehicleDetail'>;
   route: RouteProp<RootStackParamList, 'VehicleDetail'>;
+};
+
+type OrdersProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'Orders'>;
+  route: RouteProp<RootStackParamList, 'Orders'>;
 };

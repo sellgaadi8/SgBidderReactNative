@@ -20,6 +20,8 @@ import Input from '../../components/Input';
 import PrimaryButton from '../../components/PrimaryButton';
 import {onPlaceVehicleBid} from '../../redux/ducks/placebid';
 import Snackbar from 'react-native-snackbar';
+import {container} from '../../utils/styles';
+import Loader from '../../components/Loader';
 const {width} = Dimensions.get('window');
 
 export default function LiveAuction({navigation}: ExploreProps) {
@@ -34,17 +36,18 @@ export default function LiveAuction({navigation}: ExploreProps) {
     modal: '',
     vehicleType: '',
   });
+  const [loading, setLoading] = useState(false);
 
   const selectOnBid = useAppSelector(state => state.placebid);
 
   useEffect(() => {
+    setLoading(true);
     dispatch(onGetVehicleList('in_auction', '', ''));
   }, []);
 
   useEffect(() => {
     if (selectVehicleList.called) {
-      console.log('calleddddd');
-
+      setLoading(false);
       const {data, error} = selectVehicleList;
       if (!error && data) {
         setVehicleData(data);
@@ -63,6 +66,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
 
   function applyFilter(selectedFilters: CarFilterType) {
     setFilter(selectedFilters);
+    setLoading(true);
     dispatch(
       onGetVehicleList(
         'in_auction',
@@ -106,6 +110,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
 
   useEffect(() => {
     if (selectOnBid.called) {
+      setLoading(false);
       const {message, success} = selectOnBid;
       if (success) {
         setShowBidModal(false);
@@ -117,7 +122,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
         });
       } else {
         Snackbar.show({
-          text: message,
+          text: 'Your Bid is Lower than the last placed bid.',
           backgroundColor: 'red',
           duration: Snackbar.LENGTH_SHORT,
         });
@@ -126,7 +131,8 @@ export default function LiveAuction({navigation}: ExploreProps) {
   }, [selectOnBid]);
 
   return (
-    <Box>
+    <Box style={styles.container}>
+      {loading && <Loader />}
       <Pressable
         style={styles.filter}
         onPress={() => setShowFilter(!showFilter)}>
@@ -147,8 +153,6 @@ export default function LiveAuction({navigation}: ExploreProps) {
       </Pressable>
       {vehicleData?.length !== 0 ? (
         <>
-          {/* {loading && <Loader />} */}
-
           <Box style={styles.flat}>
             <FlatList
               data={vehicleData}
@@ -166,6 +170,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
             lineHeight={28}>
             No Vehicle Found
           </CustomText>
+          <Icon name="car-off" size={35} color="#111111" />
         </Box>
       )}
       {showFilter && (
@@ -203,6 +208,9 @@ export default function LiveAuction({navigation}: ExploreProps) {
 }
 
 const styles = EStyleSheet.create({
+  container: {
+    ...container,
+  },
   flat: {
     marginBottom: '20rem',
   },

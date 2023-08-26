@@ -1,5 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {Image, Keyboard, KeyboardAvoidingView, ScrollView} from 'react-native';
+import {
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {
   heightPercentageToDP as hp,
@@ -10,7 +16,6 @@ import CustomText from '../../components/CustomText';
 import {pixelSizeHorizontal, pixelSizeVertical} from '../../utils/responsive';
 import colors from '../../utils/colors';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import TextButton from '../../components/TextButton';
 import {useDispatch} from 'react-redux';
 import Snackbar from 'react-native-snackbar';
 import Input from '../../components/Input';
@@ -20,6 +25,7 @@ import {useAppSelector} from '../../utils/hook';
 import Loader from '../../components/Loader';
 import {onLogin} from '../../redux/ducks/login';
 import GlobalContext from '../../contexts/GlobalContext';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Login({navigation}: LoginProps) {
   const [mobile, setMobile] = useState('');
@@ -160,6 +166,17 @@ export default function Login({navigation}: LoginProps) {
                 maxLength={10}
                 noMargin
                 editable={!showOtp}
+                renderEndIcon={
+                  showOtp
+                    ? () => {
+                        return (
+                          <Pressable onPress={onEdit} style={styles.eye}>
+                            <Icon name="pencil" size={18} color="#111111" />
+                          </Pressable>
+                        );
+                      }
+                    : undefined
+                }
               />
 
               {showOtp && (
@@ -172,11 +189,6 @@ export default function Login({navigation}: LoginProps) {
                   error={errors?.password}
                   maxLength={6}
                   noMargin
-                  textButton={{
-                    label: 'Edit',
-                    containerStyles: styles.link,
-                    onPress: onEdit,
-                  }}
                 />
               )}
             </Box>
@@ -208,12 +220,12 @@ export default function Login({navigation}: LoginProps) {
               </Pressable>
             </Box> */}
           </Box>
-          <Box alignItems="center" mv={'7.5%'}>
+          {/* <Box alignItems="center" mv={'7.5%'}>
             <TextButton
               label="Forgot password?"
               onPress={() => navigation.navigate('ForgotPassword')}
             />
-          </Box>
+          </Box> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </Box>

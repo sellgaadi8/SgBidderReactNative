@@ -19,6 +19,7 @@ import Filter from '../../components/Filter';
 import {onOCB} from '../../redux/ducks/oneClickBuy';
 import Snackbar from 'react-native-snackbar';
 import Loader from '../../components/Loader';
+import {container} from '../../utils/styles';
 const {width} = Dimensions.get('window');
 
 export default function OCB({navigation}: ExploreProps) {
@@ -107,7 +108,7 @@ export default function OCB({navigation}: ExploreProps) {
   }
 
   return (
-    <Box>
+    <Box style={styles.container}>
       {loading && <Loader />}
       <Pressable
         style={styles.filter}
@@ -129,8 +130,6 @@ export default function OCB({navigation}: ExploreProps) {
       </Pressable>
       {vehicleData?.length !== 0 ? (
         <>
-          {/* {loading && <Loader />} */}
-
           <Box style={styles.flat}>
             <FlatList
               data={vehicleData}
@@ -148,6 +147,7 @@ export default function OCB({navigation}: ExploreProps) {
             lineHeight={28}>
             No Vehicle Found
           </CustomText>
+          <Icon name="car-off" size={35} color="#111111" />
         </Box>
       )}
       {showFilter && (
@@ -168,6 +168,9 @@ export default function OCB({navigation}: ExploreProps) {
 }
 
 const styles = EStyleSheet.create({
+  container: {
+    ...container,
+  },
   flat: {
     marginBottom: '20rem',
   },

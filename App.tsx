@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, RouteProp} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
@@ -101,7 +101,20 @@ export default function App() {
                   name="BottomNavigation"
                 />
                 <RootStack.Screen
-                  options={{headerShown: false}}
+                  options={(param: {
+                    route: RouteProp<any, any>;
+                    navigation: any;
+                  }) => {
+                    return {
+                      header: props => (
+                        <Header
+                          title={param.route.params?.title}
+                          headerProps={props}
+                          back
+                        />
+                      ),
+                    };
+                  }}
                   component={VehicleDetail}
                   name="VehicleDetail"
                 />

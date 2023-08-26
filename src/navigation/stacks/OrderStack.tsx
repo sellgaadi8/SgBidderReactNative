@@ -7,7 +7,11 @@ const OrderStackNavigation = createStackNavigator();
 export default function OrderStack() {
   return (
     <OrderStackNavigation.Navigator>
-      <OrderStackNavigation.Screen component={Orders} name="Orders" />
+      <OrderStackNavigation.Screen
+        component={Orders}
+        name="Orders"
+        options={{headerShown: false}}
+      />
     </OrderStackNavigation.Navigator>
   );
 }

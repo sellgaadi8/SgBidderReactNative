@@ -60,6 +60,15 @@ export const onPlaceVehicleBid =
               error: true,
             }),
           );
+        } else if (err?.message) {
+          dispatch(
+            placeBidAction({
+              error: true,
+              called: true,
+              message: '',
+              success: false,
+            }),
+          );
         }
       });
   };

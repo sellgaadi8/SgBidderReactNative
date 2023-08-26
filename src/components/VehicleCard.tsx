@@ -18,6 +18,7 @@ export default function VehicleCard({
   data,
   onPlaceBid,
   onPressView,
+  isOrder = true,
 }: VehicleCardProps) {
   const calculateRemainingTime = (timeDiff: number) => {
     if (timeDiff <= 0) {
@@ -177,7 +178,7 @@ export default function VehicleCard({
         </Box>
         <View style={styles.line} />
 
-        {data.vehicle_status !== 'one_click_buy' && (
+        {isOrder && data.vehicle_status !== 'one_click_buy' && (
           <Box>
             <Box style={styles.customerexpected}>
               <CustomText
@@ -224,10 +225,11 @@ export default function VehicleCard({
           )}
 
           {data.vehicle_status === 'one_click_buy' &&
+            data.ocb_value &&
             data.ocb_value.length !== 0 && (
               <Box ph={'3%'}>
                 <CustomText
-                  color="#34A02C"
+                  color="#33A02C"
                   fontSize={13}
                   lineHeight={24}
                   fontFamily="Roboto-Medium">
@@ -235,7 +237,19 @@ export default function VehicleCard({
                 </CustomText>
               </Box>
             )}
-          <Box flexDirection="row" ph={'1%'}>
+          {!isOrder && (
+            <Box style={styles.totalPrice}>
+              <CustomText
+                fontSize={14}
+                lineHeight={20}
+                color="#33A02C"
+                fontFamily="Roboto-Bold">
+                Total Price {'\n'}
+                Rs.{data.ocb_value ? data.ocb_value : data.auction_value}
+              </CustomText>
+            </Box>
+          )}
+          <Box style={styles.button}>
             <Pressable style={styles.view} onPress={onPressView}>
               <CustomText
                 fontSize={10}
@@ -245,17 +259,19 @@ export default function VehicleCard({
                 View Details
               </CustomText>
             </Pressable>
-            <Pressable style={styles.placebid} onPress={onPlaceBid}>
-              <CustomText
-                fontSize={10}
-                lineHeight={16}
-                color="#111111"
-                fontFamily="Roboto-Medium">
-                {data.vehicle_status === 'one_click_buy'
-                  ? 'Buy Now'
-                  : ' Place bid'}
-              </CustomText>
-            </Pressable>
+            {isOrder && (
+              <Pressable style={styles.placebid} onPress={onPlaceBid}>
+                <CustomText
+                  fontSize={10}
+                  lineHeight={16}
+                  color="#111111"
+                  fontFamily="Roboto-Medium">
+                  {data.vehicle_status === 'one_click_buy'
+                    ? 'Buy Now'
+                    : ' Place bid'}
+                </CustomText>
+              </Pressable>
+            )}
           </Box>
         </Box>
       </Box>
@@ -307,9 +323,9 @@ const styles = EStyleSheet.create({
   },
   view: {
     padding: '0.5rem',
-    backgroundColor: colors.secondaryLight,
+    backgroundColor: 'rgba(239, 194, 79, 0.12)',
     borderRadius: 15,
-    width: 70,
+    width: 80,
     ...contentCenter,
     borderWidth: 1,
     borderColor: colors.secondaryLight,
@@ -358,5 +374,13 @@ const styles = EStyleSheet.create({
     backgroundColor: colors.secondaryLight,
     padding: '0.2rem',
     paddingLeft: '1.5rem',
+  },
+  button: {
+    flexDirection: 'row',
+    paddingHorizontal: '1rem',
+    marginLeft: 'auto',
+  },
+  totalPrice: {
+    marginLeft: '1rem',
   },
 });

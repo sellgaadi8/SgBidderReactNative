@@ -4,7 +4,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import {useDispatch} from 'react-redux';
 import Box from '../../components/Box';
 import CustomText from '../../components/CustomText';
-import {container} from '../../utils/styles';
+import {container, contentCenter} from '../../utils/styles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Dimensions, Image, Pressable, ScrollView} from 'react-native';
 import colors from '../../utils/colors';
@@ -16,29 +16,14 @@ import {
   widthPercentageToDP,
 } from 'react-native-responsive-screen';
 import Video from 'react-native-video';
-// import PopulateImageWithData from '../../components/PopulateImageWithData';
-// import DataWithImages from '../../components/DataWithImages';
 import Loader from '../../components/Loader';
 import PopulateImageWithData from '../../components/PopulateImageWithData';
 import Modal from 'react-native-modalbox';
 import VideoPlayer from '../../components/VideoPlayer';
 import {onGetVehicleDetails} from '../../redux/ducks/getVehicleDetails';
 import {useAppSelector} from '../../utils/hook';
-// import {Animated} from 'react-native';
-// import Indicator from '../../components/Indicator';
+import RectButtonCustom from '../../components/RectButtonCustom';
 const {height, width} = Dimensions.get('window');
-const types = [
-  'Documents',
-  'Exterior',
-  'Externel panel',
-  'Tyres',
-  'Engine',
-  'Electricals',
-  'Steering',
-];
-// const max_height = 460;
-// const min_height = 0;
-// const HEADER_SCROLL_DISTANCE = max_height - min_height;
 
 export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const dispatch = useDispatch<any>();
@@ -49,13 +34,23 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const [play, setPlay] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
   const [video, setVideo] = useState('');
-  // const scrollY = new Animated.Value(0);
-  // const [currentIndex, setCurrentIndex] = useState(0);
-  // const headerHeight = scrollY.interpolate({
-  //   inputRange: [0, HEADER_SCROLL_DISTANCE],
-  //   outputRange: [max_height, min_height],
-  //   extrapolate: 'clamp',
-  // });
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const tabs = [
+    {title: 'Documents', onPress: () => onChangeTab(0)},
+    {title: 'Exterior', onPress: () => onChangeTab(1)},
+    {title: 'Externel panel', onPress: () => onChangeTab(2)},
+    {
+      title: 'Tyres',
+      onPress: () => onChangeTab(3),
+    },
+    {title: 'Engine', onPress: () => onChangeTab(4)},
+    {title: 'Electricals', onPress: () => onChangeTab(5)},
+    {
+      title: 'Steering',
+      onPress: () => onChangeTab(6),
+    },
+  ];
 
   const [okValues, setOkValues] = useState<{
     [key: string]: string | {value: string; image: string};
@@ -74,9 +69,14 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const [loading, setLoading] = useState(false);
   // const [scrollIndex, setScrollIndex] = useState(0);
 
+  function onChangeTab(index: number) {
+    setActiveIndex(index);
+  }
+
   useEffect(() => {
     setLoading(true);
     dispatch(onGetVehicleDetails(route.params.vehicleId));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -164,12 +164,6 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     console.log('ok', okValue);
   }
 
-  // function handleOnScroll(event: any) {
-  //   var abc =
-  //     event.nativeEvent.contentOffset.x / Dimensions.get('window').width;
-  //   setScrollIndex(Math.round(abc));
-  // }
-
   function onPressImage(index: number) {
     navigation.navigate('ImageViewerCarousel', {
       data: images,
@@ -192,203 +186,248 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     <Box style={styles.container}>
       {loading && <Loader />}
       <ScrollView>
-        <View>
-          <ScrollView
-            horizontal={true}
-            // onScroll={handleOnScroll}
-            showsHorizontalScrollIndicator={false}>
-            {vehicleImage &&
-              vehicleImage?.map((el, index) => {
-                return (
-                  <Box key={index.toString()}>
-                    {el && el?.includes('mp4') ? (
-                      <Box>
-                        <Video
-                          source={{uri: el}}
-                          style={styles.images}
-                          resizeMode="cover"
-                          paused={!play}
-                          repeat={true}
-                          muted
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          {vehicleImage &&
+            vehicleImage?.map((el, index) => {
+              return (
+                <Box key={index.toString()}>
+                  {el && el?.includes('mp4') ? (
+                    <Box>
+                      <Video
+                        source={{uri: el}}
+                        style={styles.images}
+                        resizeMode="cover"
+                        paused={!play}
+                        repeat={true}
+                        muted
+                      />
+                      <Pressable
+                        style={styles.play}
+                        onPress={() => setPlay(!play)}>
+                        <Ionicons
+                          name={!play ? 'play' : 'pause'}
+                          color="#FFFFFF"
+                          size={30}
                         />
-                        <Pressable
-                          style={styles.play}
-                          onPress={() => setPlay(!play)}>
-                          <Ionicons
-                            name={!play ? 'play' : 'pause'}
-                            color="#FFFFFF"
-                            size={30}
-                          />
-                        </Pressable>
-                      </Box>
-                    ) : (
-                      el && (
-                        <Image
-                          source={{uri: el}}
-                          style={styles.images}
-                          resizeMode="cover"
-                        />
-                      )
-                    )}
-                  </Box>
-                );
-              })}
-          </ScrollView>
-          {/* {vehicleImage && (
-            <View
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                position: 'absolute',
-                padding: 10,
-                right: 10,
-                bottom: 180,
-              }}>
-              <Indicator index={scrollIndex} length={vehicleImage.length} />
-            </View>
-          )} */}
-          <Box pv={'5%'} ph={'6%'}>
+                      </Pressable>
+                    </Box>
+                  ) : (
+                    el && (
+                      <Image
+                        source={{uri: el}}
+                        style={styles.images}
+                        resizeMode="cover"
+                      />
+                    )
+                  )}
+                </Box>
+              );
+            })}
+        </ScrollView>
+        <Box pv={'5%'} ph={'6%'}>
+          <CustomText
+            fontSize={22}
+            lineHeight={32}
+            color="#111111"
+            fontFamily="Roboto-Medium">
+            {vehicleDetails?.display_info.make}{' '}
+            {vehicleDetails?.display_info.model}
+          </CustomText>
+          <Box flexDirection="row">
             <CustomText
-              fontSize={22}
-              lineHeight={32}
+              fontSize={11}
+              lineHeight={18}
               color="#111111"
               fontFamily="Roboto-Medium">
-              {vehicleDetails?.display_info.make}{' '}
-              {vehicleDetails?.display_info.model}
+              {vehicleDetails?.display_info.variant}
             </CustomText>
+            <CustomText
+              fontSize={12}
+              lineHeight={18}
+              color="#111111"
+              fontFamily="Roboto-Medium"
+              style={{marginLeft: 5}}>
+              ({vehicleDetails?.display_info.color})
+            </CustomText>
+          </Box>
+          <Box flexDirection="row" justifyContent="space-between" pv={'3%'}>
             <Box flexDirection="row">
-              <CustomText
-                fontSize={11}
-                lineHeight={18}
-                color="#111111"
-                fontFamily="Roboto-Medium">
-                {vehicleDetails?.display_info.variant}
-              </CustomText>
+              <MaterialCommunityIcons
+                name="gas-station-outline"
+                size={20}
+                color={colors.primary}
+                style={styles.marginRight}
+              />
               <CustomText
                 fontSize={12}
                 lineHeight={18}
                 color="#111111"
-                fontFamily="Roboto-Medium"
-                style={{marginLeft: 5}}>
-                ({vehicleDetails?.display_info.color})
+                fontFamily="Roboto-Medium">
+                {vehicleDetails?.display_info.fuel_type}
               </CustomText>
             </Box>
-            <Box flexDirection="row" justifyContent="space-between" pv={'3%'}>
-              <Box flexDirection="row">
-                <MaterialCommunityIcons
-                  name="gas-station-outline"
-                  size={20}
-                  color={colors.primary}
-                  style={styles.marginRight}
-                />
-                <CustomText
-                  fontSize={12}
-                  lineHeight={18}
-                  color="#111111"
-                  fontFamily="Roboto-Medium">
-                  {vehicleDetails?.display_info.fuel_type}
-                </CustomText>
-              </Box>
-              <Box flexDirection="row">
-                <Ionicons
-                  name="car-outline"
-                  size={20}
-                  color={colors.primary}
-                  style={styles.marginRight}
-                />
-                <CustomText
-                  fontSize={12}
-                  lineHeight={18}
-                  color="#111111"
-                  fontFamily="Roboto-Medium">
-                  {vehicleDetails?.display_info.no_of_kms} (Km)
-                </CustomText>
-              </Box>
-              <Box flexDirection="row">
-                <Ionicons
-                  name="people-outline"
-                  size={20}
-                  color={colors.primary}
-                  style={styles.marginRight}
-                />
-                <CustomText
-                  fontSize={12}
-                  lineHeight={18}
-                  color="#111111"
-                  fontFamily="Roboto-Medium">
-                  {vehicleDetails?.display_info.no_of_owners}
-                </CustomText>
-              </Box>
+            <Box flexDirection="row">
+              <Ionicons
+                name="car-outline"
+                size={20}
+                color={colors.primary}
+                style={styles.marginRight}
+              />
+              <CustomText
+                fontSize={12}
+                lineHeight={18}
+                color="#111111"
+                fontFamily="Roboto-Medium">
+                {vehicleDetails?.display_info.no_of_kms} (Km)
+              </CustomText>
+            </Box>
+            <Box flexDirection="row">
+              <Ionicons
+                name="people-outline"
+                size={20}
+                color={colors.primary}
+                style={styles.marginRight}
+              />
+              <CustomText
+                fontSize={12}
+                lineHeight={18}
+                color="#111111"
+                fontFamily="Roboto-Medium">
+                {vehicleDetails?.display_info.no_of_owners}
+              </CustomText>
             </Box>
           </Box>
-        </View>
-        <ScrollView horizontal>
-          {types.map((el, index) => {
-            return (
-              <Pressable key={index.toString()} style={styles.headers}>
-                <CustomText
-                  color="White"
-                  fontFamily="Roboto-Regular"
-                  fontSize={16}
-                  lineHeight={22}>
-                  {el}
-                </CustomText>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-        {/* <ScrollView
-      // scrollEventThrottle={16}
-      // onScroll={Animated.event(
-      //   [{nativeEvent: {contentOffset: {y: scrollY}}}],
-      //   {useNativeDriver: false, listener: handleOnScroll},
-      // )}
-      > */}
-        <Box style={styles.body}>
-          {vehicleDetails?.car_docs && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>Documents</CustomText>
-              {Object.entries(vehicleDetails?.car_docs).map((el, index) => {
+          <View style={styles.line} />
+          <Box>
+            <Box style={styles.customerexpected}>
+              <CustomText
+                color="#111111"
+                fontSize={14}
+                lineHeight={22}
+                fontFamily="Roboto-Medium">
+                Customer expected price: Rs.{route.params.auctionValue}
+              </CustomText>
+            </Box>
+            <Box style={styles.highestbid}>
+              <CustomText
+                color="#FFFFFF"
+                fontSize={16}
+                lineHeight={22}
+                fontFamily="Roboto-Medium">
+                Highest Bid: Rs.10,00,000
+              </CustomText>
+            </Box>
+          </Box>
+          <Box style={styles.tabBg}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {tabs.map((el, idx) => {
                 return (
-                  <PopulateImageWithData
-                    key={index.toString()}
-                    title={el[0].replace(/_/g, ' ').toUpperCase()}
-                    image={
-                      typeof el[1] === 'object' && el[1] !== null
-                        ? el[1].image
-                        : ''
-                    }
-                    value={
-                      typeof el[1] === 'object' && el[1] !== null
-                        ? el[1].value
-                        : el[1]
-                    }
-                    onPressImage={() => onPressImage(index)}
-                  />
+                  <View key={idx} style={styles.tab}>
+                    <RectButtonCustom
+                      key={idx}
+                      onPress={el.onPress}
+                      style={styles.touchable}>
+                      <CustomText
+                        color={idx === activeIndex ? '#FFFFFF' : '#5D5D5D'}
+                        fontFamily={
+                          idx === activeIndex ? 'Roboto-Bold' : 'Roboto-Medium'
+                        }
+                        fontSize={15}>
+                        {el.title}
+                      </CustomText>
+                    </RectButtonCustom>
+                  </View>
                 );
               })}
-            </Box>
-          )}
+            </ScrollView>
+          </Box>
 
-          {vehicleDetails?.exterior_img && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>Exterior</CustomText>
-              <Box pv={'3%'}>
-                <CustomText style={styles.value}>
-                  {okValues &&
-                    Object.keys(okValues)
-                      .map(el => {
-                        return el
-                          .split('_')
-                          .map(
-                            word =>
-                              word.charAt(0).toUpperCase() + word.slice(1),
-                          )
-                          .join(' ');
-                      })
-                      .join(', ')}
+          <Box style={styles.body}>
+            {activeIndex === 0 && vehicleDetails?.car_docs && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>Documents</CustomText>
+                {Object.entries(vehicleDetails?.car_docs).map((el, index) => {
+                  return (
+                    <PopulateImageWithData
+                      key={index.toString()}
+                      title={el[0].replace(/_/g, ' ').toUpperCase()}
+                      image={
+                        typeof el[1] === 'object' && el[1] !== null
+                          ? el[1].image
+                          : ''
+                      }
+                      value={
+                        typeof el[1] === 'object' && el[1] !== null
+                          ? el[1].value
+                          : el[1]
+                      }
+                      onPressImage={() => onPressImage(index)}
+                    />
+                  );
+                })}
+              </Box>
+            )}
+
+            {activeIndex === 1 && vehicleDetails?.exterior_img && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>Exterior</CustomText>
+                <Box pv={'3%'}>
+                  <CustomText style={styles.value}>
+                    {okValues &&
+                      Object.keys(okValues)
+                        .map(el => {
+                          return el
+                            .split('_')
+                            .map(
+                              word =>
+                                word.charAt(0).toUpperCase() + word.slice(1),
+                            )
+                            .join(' ');
+                        })
+                        .join(', ')}
+                  </CustomText>
+
+                  {Object.entries(vehicleDetails.exterior_img).map(
+                    (el, index) => {
+                      if (typeof el[1] === 'object') {
+                        return (
+                          <PopulateImageWithData
+                            key={index.toString()}
+                            title={el[0].replace(/_/g, ' ').toUpperCase()}
+                            image={el[1] ? el[1].image : ''}
+                            value={el[1] ? el[1].value : ''}
+                            onPressImage={() => onPressImage(index)}
+                          />
+                        );
+                      }
+                    },
+                  )}
+                </Box>
+              </Box>
+            )}
+
+            {activeIndex === 2 && vehicleDetails?.external_panel && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>
+                  Externel Panel
                 </CustomText>
-
-                {Object.entries(vehicleDetails.exterior_img).map(
+                <Box pv={'3%'}>
+                  <CustomText style={styles.value}>
+                    {okValuesExternel &&
+                      Object.keys(okValuesExternel)
+                        .map(el => {
+                          return el
+                            .split('_')
+                            .map(
+                              word =>
+                                word.charAt(0).toUpperCase() + word.slice(1),
+                            )
+                            .join(' ');
+                        })
+                        .join(', ')}
+                  </CustomText>
+                </Box>
+                {Object.entries(vehicleDetails.external_panel).map(
                   (el, index) => {
                     if (typeof el[1] === 'object') {
                       return (
@@ -404,129 +443,11 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                   },
                 )}
               </Box>
-            </Box>
-          )}
-
-          {vehicleDetails?.external_panel && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>
-                Externel Panel
-              </CustomText>
-              <Box pv={'3%'}>
-                <CustomText style={styles.value}>
-                  {okValuesExternel &&
-                    Object.keys(okValuesExternel)
-                      .map(el => {
-                        return el
-                          .split('_')
-                          .map(
-                            word =>
-                              word.charAt(0).toUpperCase() + word.slice(1),
-                          )
-                          .join(' ');
-                      })
-                      .join(', ')}
-                </CustomText>
-              </Box>
-              {Object.entries(vehicleDetails.external_panel).map(
-                (el, index) => {
-                  if (typeof el[1] === 'object') {
-                    return (
-                      <PopulateImageWithData
-                        key={index.toString()}
-                        title={el[0].replace(/_/g, ' ').toUpperCase()}
-                        image={el[1] ? el[1].image : ''}
-                        value={el[1] ? el[1].value : ''}
-                        onPressImage={() => onPressImage(index)}
-                      />
-                    );
-                  }
-                },
-              )}
-            </Box>
-          )}
-          {vehicleDetails?.tyres && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>Tyres</CustomText>
-              {Object.entries(vehicleDetails.tyres).map((el, index) => {
-                return (
-                  <PopulateImageWithData
-                    key={index.toString()}
-                    title={el[0].replace(/_/g, ' ').toUpperCase()}
-                    image={el[1] ? el[1].image : ''}
-                    value={el[1] ? el[1].value : ''}
-                    onPressImage={() => onPressImage(index)}
-                  />
-                );
-              })}
-            </Box>
-          )}
-          {vehicleDetails?.engine && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>Engine</CustomText>
-              {Object.entries(vehicleDetails.engine).map((el, index) => {
-                return (
-                  <PopulateImageWithData
-                    key={index.toString()}
-                    title={el[0].replace(/_/g, ' ').toUpperCase()}
-                    image={
-                      typeof el[1] === 'object' && el[1] !== null
-                        ? el[1].image
-                        : ''
-                    }
-                    value={
-                      typeof el[1] === 'object' && el[1] !== null
-                        ? el[1].value.replace(/_/g, ' ').toUpperCase()
-                        : !el[1]?.includes('https')
-                        ? el[1]
-                        : ''
-                    }
-                    onPressImage={() => onPressImage(index)}
-                    onPressVideo={() =>
-                      onPressVideo(
-                        typeof el[1] === 'object'
-                          ? el[1]?.image.includes('mp4')
-                            ? el[1].image
-                            : ''
-                          : '',
-                      )
-                    }
-                  />
-                );
-              })}
-            </Box>
-          )}
-          {vehicleDetails?.electricals && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>Electricals</CustomText>
-              {Object.entries(vehicleDetails.electricals).map((el, index) => {
-                return (
-                  <PopulateImageWithData
-                    key={index.toString()}
-                    title={el[0].replace(/_/g, ' ').toUpperCase()}
-                    image={
-                      typeof el[1] === 'object' && el[1] !== null
-                        ? el[1].image
-                        : ''
-                    }
-                    value={
-                      typeof el[1] === 'object' && el[1] !== null
-                        ? el[1].value
-                        : el[1]
-                    }
-                    onPressImage={() => onPressImage(index)}
-                  />
-                );
-              })}
-            </Box>
-          )}
-          {vehicleDetails?.handling_and_suspension && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>
-                Handling and Suspension
-              </CustomText>
-              {Object.entries(vehicleDetails.handling_and_suspension).map(
-                (el, index) => {
+            )}
+            {activeIndex === 3 && vehicleDetails?.tyres && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>Tyres</CustomText>
+                {Object.entries(vehicleDetails.tyres).map((el, index) => {
                   return (
                     <PopulateImageWithData
                       key={index.toString()}
@@ -536,33 +457,114 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                       onPressImage={() => onPressImage(index)}
                     />
                   );
-                },
-              )}
-            </Box>
-          )}
-          {vehicleDetails?.steering && (
-            <Box>
-              <CustomText style={styles.vehicleHeading}>Steering</CustomText>
-              {Object.entries(vehicleDetails.steering).map((el, index) => {
-                if (typeof el[1] !== 'object') {
+                })}
+              </Box>
+            )}
+            {activeIndex === 4 && vehicleDetails?.engine && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>Engine</CustomText>
+                {Object.entries(vehicleDetails.engine).map((el, index) => {
                   return (
-                    <Box
+                    <PopulateImageWithData
                       key={index.toString()}
-                      flexDirection="row"
-                      justifyContent="space-between"
-                      pv={'3%'}
-                      alignItems="center"
-                      width={'90%'}>
-                      <CustomText style={styles.dataValue}>
-                        {el[0].replace(/_/g, ' ').toUpperCase()}
-                      </CustomText>
-                      <CustomText style={styles.value}>{el[1]}</CustomText>
-                    </Box>
+                      title={el[0].replace(/_/g, ' ').toUpperCase()}
+                      image={
+                        typeof el[1] === 'object' && el[1] !== null
+                          ? el[1].image
+                          : ''
+                      }
+                      value={
+                        typeof el[1] === 'object' && el[1] !== null
+                          ? el[1].value.replace(/_/g, ' ').toUpperCase()
+                          : !el[1]?.includes('https')
+                          ? el[1]
+                          : ''
+                      }
+                      onPressImage={() => onPressImage(index)}
+                      onPressVideo={() =>
+                        onPressVideo(
+                          typeof el[1] === 'object'
+                            ? el[1]?.image.includes('mp4')
+                              ? el[1].image
+                              : ''
+                            : '',
+                        )
+                      }
+                    />
                   );
-                }
-              })}
-            </Box>
-          )}
+                })}
+              </Box>
+            )}
+            {activeIndex === 5 && vehicleDetails?.electricals && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>
+                  Electricals
+                </CustomText>
+                {Object.entries(vehicleDetails.electricals).map((el, index) => {
+                  return (
+                    <PopulateImageWithData
+                      key={index.toString()}
+                      title={el[0].replace(/_/g, ' ').toUpperCase()}
+                      image={
+                        typeof el[1] === 'object' && el[1] !== null
+                          ? el[1].image
+                          : ''
+                      }
+                      value={
+                        typeof el[1] === 'object' && el[1] !== null
+                          ? el[1].value
+                          : el[1]
+                      }
+                      onPressImage={() => onPressImage(index)}
+                    />
+                  );
+                })}
+              </Box>
+            )}
+            {activeIndex === 6 && vehicleDetails?.handling_and_suspension && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>
+                  Handling and Suspension
+                </CustomText>
+                {Object.entries(vehicleDetails.handling_and_suspension).map(
+                  (el, index) => {
+                    return (
+                      <PopulateImageWithData
+                        key={index.toString()}
+                        title={el[0].replace(/_/g, ' ').toUpperCase()}
+                        image={el[1] ? el[1].image : ''}
+                        value={el[1] ? el[1].value : ''}
+                        onPressImage={() => onPressImage(index)}
+                      />
+                    );
+                  },
+                )}
+              </Box>
+            )}
+            {activeIndex === 6 && vehicleDetails?.steering && (
+              <Box>
+                <CustomText style={styles.vehicleHeading}>Steering</CustomText>
+                {Object.entries(vehicleDetails.steering).map((el, index) => {
+                  if (typeof el[1] !== 'object') {
+                    return (
+                      <Box
+                        key={index.toString()}
+                        flexDirection="row"
+                        justifyContent="space-between"
+                        pv={'3%'}
+                        alignItems="center"
+                        width={'90%'}>
+                        <CustomText style={styles.dataValue}>
+                          {el[0].replace(/_/g, ' ').toUpperCase()}
+                        </CustomText>
+                        <CustomText style={styles.value}>{el[1]}</CustomText>
+                      </Box>
+                    );
+                  }
+                })}
+              </Box>
+            )}
+          </Box>
         </Box>
       </ScrollView>
       <Modal
@@ -572,6 +574,9 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
         position="bottom">
         <VideoPlayer video={video} onPressClose={onClosedVideo} />
       </Modal>
+      <Box style={styles.bottom}>
+        <CustomText>Closing Price</CustomText>
+      </Box>
     </Box>
   );
 }
@@ -581,7 +586,7 @@ const styles = EStyleSheet.create({
     ...container,
   },
   images: {
-    height: height * 0.38,
+    height: height * 0.35,
     width: width,
   },
   line: {
@@ -589,7 +594,7 @@ const styles = EStyleSheet.create({
     height: '0.1rem',
     width: '100%',
     alignSelf: 'center',
-    marginBottom: '1rem',
+    // marginBottom: '1rem',
   },
   tabel: {},
   headers: {
@@ -652,5 +657,35 @@ const styles = EStyleSheet.create({
   modal: {
     height: 'auto',
     width: '100%',
+  },
+  touchable: {
+    padding: '1rem',
+    ...contentCenter,
+  },
+  tab: {
+    marginRight: '1rem',
+    marginLeft: '1rem',
+    marginBottom: '1rem',
+    marginTop: '0.5rem',
+  },
+  tabBg: {
+    backgroundColor: '#111111',
+    marginTop: '2rem',
+  },
+  highestbid: {
+    marginTop: '1rem',
+    backgroundColor: '#34A02C',
+    padding: '0.2rem',
+    paddingLeft: '1.5rem',
+  },
+  customerexpected: {
+    marginTop: '1.5rem',
+    backgroundColor: colors.secondaryLight,
+    padding: '0.2rem',
+    paddingLeft: '1.5rem',
+  },
+  bottom: {
+    padding: '2.5rem',
+    backgroundColor: '#EAEAEA',
   },
 });
