@@ -254,3 +254,8 @@ type OrdersProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Orders'>;
   route: RouteProp<RootStackParamList, 'Orders'>;
 };
+
+type EditProfileProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'EditProfile'>;
+  route: RouteProp<RootStackParamList, 'EditProfile'>;
+};

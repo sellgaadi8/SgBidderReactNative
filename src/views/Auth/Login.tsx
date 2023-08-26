@@ -101,7 +101,10 @@ export default function Login({navigation}: LoginProps) {
         });
       } else if (is_register === 1) {
         setUserPhone(mobile);
-        navigation.navigate('EditProfile');
+        setAuthenticated(true);
+        setTimeout(() => {
+          navigation.navigate('EditProfile', {isRegister: true});
+        }, 1000);
       } else if (!success) {
         Snackbar.show({
           text: message,

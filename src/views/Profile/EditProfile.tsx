@@ -19,7 +19,7 @@ import {onUpdateProfile} from '../../redux/ducks/updateProfile';
 import {useAppSelector} from '../../utils/hook';
 import {isEmailValid, isNameValid} from '../../utils/regex';
 
-export default function EditProfile() {
+export default function EditProfile({navigation, route}: EditProfileProps) {
   const [name, setName] = useState('');
   const [address1, setAddress1] = useState('');
   const [gst, setGst] = useState('');
@@ -28,7 +28,7 @@ export default function EditProfile() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<EditProfileErrors>();
-  const {userPhone, setAuthenticated} = useContext(GlobalContext);
+  const {userPhone} = useContext(GlobalContext);
   const dipatch = useDispatch<any>();
   const selectProfileUpate = useAppSelector(state => state.updateProfile);
 
@@ -66,13 +66,13 @@ export default function EditProfile() {
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });
-        setAuthenticated(true);
+        navigation.navigate('ExploreStack');
       }
     }
   }, [selectProfileUpate]);
 
   function onSkip() {
-    setAuthenticated(true);
+    navigation.navigate('ExploreStack');
   }
 
   return (
@@ -121,6 +121,7 @@ export default function EditProfile() {
           value={adhar}
           onChangeText={setAdhar}
           maxLength={12}
+          keyboardType="numeric"
         />
         <Box style={styles.buttonContainer}>
           <Box width={'45%'}>

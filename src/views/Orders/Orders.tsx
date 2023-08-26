@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Dimensions,
   FlatList,
@@ -18,11 +19,11 @@ import {onGetVehicleList} from '../../redux/ducks/vehicleList';
 import Loader from '../../components/Loader';
 import VehicleCard from '../../components/VehicleCard';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-// import Animated, {
-//   useAnimatedStyle,
-//   useSharedValue,
-//   withSpring,
-// } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 const {width} = Dimensions.get('screen');
 
 export default function Orders({navigation}: OrdersProps) {
@@ -57,17 +58,17 @@ export default function Orders({navigation}: OrdersProps) {
     setLoading(true);
     dispatch(onGetVehicleList(status, '', ''));
   }
-  // const translateX = useSharedValue(0);
+  const translateX = useSharedValue(0);
 
-  // useEffect(() => {
-  //   translateX.value = withSpring((width / 4) * activeIndex);
-  // }, [activeIndex, translateX]);
+  useEffect(() => {
+    translateX.value = withSpring((width / 3.3) * activeIndex);
+  }, [activeIndex, translateX]);
 
-  // const animatedStyles = useAnimatedStyle(() => {
-  //   return {
-  //     transform: [{translateX: translateX.value}],
-  //   };
-  // }, []);
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{translateX: translateX.value}],
+    };
+  }, []);
 
   useEffect(() => {
     if (selectVehicleList.called) {
@@ -91,6 +92,7 @@ export default function Orders({navigation}: OrdersProps) {
             auctionValue: item.auction_value
               ? item.auction_value
               : item.ocb_value,
+            isOrder: true,
           })
         }
         isOrder={false}
@@ -132,9 +134,9 @@ export default function Orders({navigation}: OrdersProps) {
               </View>
             );
           })}
-          {/* <View style={styles.lineContainer}>
+          <View style={styles.lineContainer}>
             <Animated.View style={[styles.line, animatedStyles]} />
-          </View> */}
+          </View>
         </ScrollView>
       </Box>
       {vehicleData?.length !== 0 ? (
@@ -204,7 +206,7 @@ const styles = EStyleSheet.create({
     bottom: 0,
   },
   line: {
-    width: width / 4,
+    width: width / 3.5,
     backgroundColor: colors.secondary,
     height: 3,
   },

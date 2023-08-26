@@ -37,15 +37,13 @@ export default function Profile({navigation}: ProfileProps) {
   const {setAuthenticated} = useContext(GlobalContext);
 
   function details(index: number) {
-    if (profileDetail?.dealership_name) {
-      switch (index) {
-        case 0:
-          return navigation.navigate('EditProfile', {
-            title: profileDetail?.dealership_name,
-          });
-        default:
-          break;
-      }
+    switch (index) {
+      case 0:
+        return navigation.navigate('EditProfile', {
+          title: profileDetail?.dealership_name,
+        });
+      default:
+        break;
     }
   }
   useEffect(() => {
@@ -117,7 +115,7 @@ export default function Profile({navigation}: ProfileProps) {
         {Button.map((el, index) => {
           return (
             <Pressable
-              // onPress={() => details(index)}
+              onPress={() => details(index)}
               key={index.toString()}
               style={[
                 styles.button,

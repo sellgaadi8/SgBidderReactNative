@@ -81,17 +81,6 @@ export default function App() {
                   component={CreatePassword}
                   name="CreatePassword"
                 />
-                <RootStack.Screen
-                  options={() => {
-                    return {
-                      header: props => (
-                        <Header title="Update Profile" headerProps={props} />
-                      ),
-                    };
-                  }}
-                  component={EditProfile}
-                  name="EditProfile"
-                />
               </>
             ) : (
               <>
@@ -117,6 +106,17 @@ export default function App() {
                   }}
                   component={VehicleDetail}
                   name="VehicleDetail"
+                />
+                <RootStack.Screen
+                  options={() => {
+                    return {
+                      header: props => (
+                        <Header title="Update Profile" headerProps={props} />
+                      ),
+                    };
+                  }}
+                  component={EditProfile}
+                  name="EditProfile"
                 />
               </>
             )}

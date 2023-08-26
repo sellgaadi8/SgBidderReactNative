@@ -23,6 +23,11 @@ import VideoPlayer from '../../components/VideoPlayer';
 import {onGetVehicleDetails} from '../../redux/ducks/getVehicleDetails';
 import {useAppSelector} from '../../utils/hook';
 import RectButtonCustom from '../../components/RectButtonCustom';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 const {height, width} = Dimensions.get('window');
 
 export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
@@ -72,6 +77,18 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   function onChangeTab(index: number) {
     setActiveIndex(index);
   }
+
+  const translateX = useSharedValue(0);
+
+  useEffect(() => {
+    translateX.value = withSpring((width / 3.5) * activeIndex);
+  }, [activeIndex, translateX]);
+
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{translateX: translateX.value}],
+    };
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -319,7 +336,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
             </Box>
           </Box>
           <Box style={styles.tabBg}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={true}>
               {tabs.map((el, idx) => {
                 return (
                   <View key={idx} style={styles.tab}>
@@ -340,6 +357,9 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                 );
               })}
             </ScrollView>
+            <View style={styles.lineContainer}>
+              <Animated.View style={[styles.dash, animatedStyles]} />
+            </View>
           </Box>
 
           <Box style={styles.body}>
@@ -574,9 +594,11 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
         position="bottom">
         <VideoPlayer video={video} onPressClose={onClosedVideo} />
       </Modal>
-      <Box style={styles.bottom}>
-        <CustomText>Closing Price</CustomText>
-      </Box>
+      {!route.params.isOrder && (
+        <Box style={styles.bottom}>
+          <CustomText>Closing Price</CustomText>
+        </Box>
+      )}
     </Box>
   );
 }
@@ -687,5 +709,10 @@ const styles = EStyleSheet.create({
   bottom: {
     padding: '2.5rem',
     backgroundColor: '#EAEAEA',
+  },
+  dash: {
+    width: width / 3,
+    backgroundColor: colors.secondary,
+    height: 3,
   },
 });
