@@ -16,13 +16,19 @@ import VehicleCard from '../../components/VehicleCard';
 import Filter from '../../components/Filter';
 import Modal from 'react-native-modalbox';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Input from '../../components/Input';
-import PrimaryButton from '../../components/PrimaryButton';
 import {onPlaceVehicleBid} from '../../redux/ducks/placebid';
 import Snackbar from 'react-native-snackbar';
 import {container} from '../../utils/styles';
 import Loader from '../../components/Loader';
+import BidWindow from '../../components/BidWindow';
+import {onGlobalChange} from '../../redux/ducks/global';
 const {width} = Dimensions.get('window');
+
+const Amounts = [
+  {label: '5000', value: 5000},
+  {label: '10,000', value: '10000'},
+  {label: '2,00,000', value: '200000'},
+];
 
 export default function LiveAuction({navigation}: ExploreProps) {
   const dispatch = useDispatch<any>();
@@ -37,6 +43,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
     vehicleType: '',
   });
   const [loading, setLoading] = useState(false);
+  const [vehicleDetail, setVehicleDetail] = useState<Vehicle>();
 
   const selectOnBid = useAppSelector(state => state.placebid);
 
@@ -55,9 +62,11 @@ export default function LiveAuction({navigation}: ExploreProps) {
     }
   }, [selectVehicleList]);
 
-  function onPlaceBid(vid: string) {
-    setId(vid);
+  function onPlaceBid(el: Vehicle) {
+    setId(el.uuid);
     setShowBidModal(true);
+    setVehicleDetail(el);
+    dispatch(onGlobalChange({showBottomTabs: false}));
   }
 
   function onClosedFilter() {
@@ -81,7 +90,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
     return (
       <VehicleCard
         data={item}
-        onPlaceBid={() => onPlaceBid(item.uuid)}
+        onPlaceBid={() => onPlaceBid(item)}
         onPressView={() =>
           navigation.navigate('VehicleDetail', {
             title: item.model,
@@ -94,6 +103,7 @@ export default function LiveAuction({navigation}: ExploreProps) {
 
   function onCloseBidModal() {
     setShowBidModal(false);
+    dispatch(onGlobalChange({showBottomTabs: true}));
   }
 
   function onSubmitBid() {
@@ -129,6 +139,22 @@ export default function LiveAuction({navigation}: ExploreProps) {
       }
     }
   }, [selectOnBid]);
+
+  function onPlus() {
+    let temp = 1000 + Number(amount);
+    setAmount(temp.toString());
+  }
+
+  function onMinus() {
+    if (+amount !== 0) {
+      let temp = Number(amount) - 1000;
+      setAmount(temp.toString());
+    }
+  }
+
+  function onAddAmount(value: number) {
+    setAmount(value.toString());
+  }
 
   return (
     <Box style={styles.container}>
@@ -191,17 +217,17 @@ export default function LiveAuction({navigation}: ExploreProps) {
         onClosed={onCloseBidModal}
         style={styles.modal}
         position="top">
-        <Box style={styles.bid}>
-          <Input
-            value={amount}
-            onChangeText={setAmount}
-            label="Bid Value"
-            keyboardType="numeric"
-          />
-          <Box>
-            <PrimaryButton label="Bid" onPress={onSubmitBid} />
-          </Box>
-        </Box>
+        <BidWindow
+          data={vehicleDetail}
+          onClose={onCloseBidModal}
+          onMinus={onMinus}
+          onPlaceBid={onSubmitBid}
+          onPlus={onPlus}
+          value={amount}
+          onChangeText={setAmount}
+          amounts={Amounts}
+          onAddAmount={onAddAmount}
+        />
       </Modal>
     </Box>
   );
@@ -212,7 +238,7 @@ const styles = EStyleSheet.create({
     ...container,
   },
   flat: {
-    marginBottom: '20rem',
+    marginBottom: '7rem',
   },
   flatList: {
     padding: '2rem',

@@ -1,13 +1,12 @@
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet} from 'react-native';
 import React, {useState} from 'react';
 import Box from '../../components/Box';
-import Input from '../../components/Input';
 import colors from '../../utils/colors';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TopTabs from '../../components/TopTabs';
 import LiveAuction from './LiveAuction';
 import OCB from './OCB';
+import CustomText from '../../components/CustomText';
 
 export default function Explore(props: ExploreProps) {
   const tabs = [
@@ -23,22 +22,15 @@ export default function Explore(props: ExploreProps) {
   return (
     <Box style={styles.container}>
       <Box style={styles.header}>
-        <Box
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center">
+        <Box flexDirection="row" alignItems="center" justifyContent="center">
           <Box style={styles.inputContainer}>
-            <Input
-              placeholder="make , model , year, fuel type .."
-              input={styles.input}
-              renderEndIcon={() => {
-                return (
-                  <View style={styles.search}>
-                    <MaterialIcons name="search" size={25} color="#FFFFFF" />
-                  </View>
-                );
-              }}
-            />
+            <CustomText
+              color="#FFFFFF"
+              fontFamily="Roboto-Medium"
+              fontSize={22}
+              lineHeight={28}>
+              Welcome !
+            </CustomText>
           </Box>
           <Pressable style={styles.bell}>
             <Icon name="bell-outline" size={25} color="#FFFFFF" />
@@ -67,10 +59,9 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     padding: 15,
-    top: 10,
-    width: '80%',
   },
   bell: {
+    position: 'absolute',
     right: 25,
   },
   search: {

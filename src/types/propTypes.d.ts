@@ -259,3 +259,13 @@ type EditProfileProps = {
   navigation: StackNavigationProp<RootStackParamList, 'EditProfile'>;
   route: RouteProp<RootStackParamList, 'EditProfile'>;
 };
+
+type BidWindowProps = {
+  data: Vehicle;
+  onPlaceBid: () => void;
+  onPlus: () => void;
+  onMinus: () => void;
+  onClose: () => void;
+  amounts: {label: string; value: number}[];
+  onAddAmount: (value: number) => void;
+};
