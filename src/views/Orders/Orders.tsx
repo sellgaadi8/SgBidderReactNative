@@ -1,8 +1,10 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Dimensions,
   FlatList,
   ListRenderItemInfo,
+  Pressable,
   ScrollView,
   View,
 } from 'react-native';
@@ -24,6 +26,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import {OrdersProps} from '../../types/propTypes';
 const {width} = Dimensions.get('screen');
 
 export default function Orders({navigation}: OrdersProps) {
@@ -47,16 +50,21 @@ export default function Orders({navigation}: OrdersProps) {
   const selectVehicleList = useAppSelector(state => state.vechicleList);
   const [vehicleData, setVehicleData] = useState<Vehicle[]>();
   const [loading, setLoading] = useState(false);
+  // const [dealLost, setDealLost] = useState<LostDeal[]>([]);
+  const [count, setCount] = useState('');
 
   useEffect(() => {
     setLoading(true);
-    dispatch(onGetVehicleList('in_negotiation', '', ''));
+    dispatch(onGetVehicleList('in_negotiation', '', '', 1));
+    if (activeIndex === 0) {
+      // dispatch(getDealLostList());
+    }
   }, []);
 
   function onChangeTab(index: number, status: string) {
     setActiveIndex(index);
     setLoading(true);
-    dispatch(onGetVehicleList(status, '', ''));
+    dispatch(onGetVehicleList(status, '', '', 1));
   }
   const translateX = useSharedValue(0);
 
@@ -75,7 +83,7 @@ export default function Orders({navigation}: OrdersProps) {
       setLoading(false);
       const {data, error} = selectVehicleList;
       if (!error && data) {
-        setVehicleData(data);
+        setVehicleData(data.vehicle_list);
         console.log('data', JSON.stringify(data));
       }
     }
@@ -85,16 +93,9 @@ export default function Orders({navigation}: OrdersProps) {
     return (
       <VehicleCard
         data={item}
-        onPressView={() =>
-          navigation.navigate('VehicleDetail', {
-            title: item.model,
-            vehicleId: item.uuid,
-            auctionValue: item.auction_value
-              ? item.auction_value
-              : item.ocb_value,
-            isOrder: true,
-          })
-        }
+        onPressView={() => {
+          navigation.navigate('OrderChart', {vehicleData: item});
+        }}
         isOrder={false}
       />
     );
@@ -139,6 +140,27 @@ export default function Orders({navigation}: OrdersProps) {
           </View>
         </ScrollView>
       </Box>
+      {activeIndex === 0 && (
+        <Box style={styles.dealBox}>
+          <CustomText
+            fontFamily="Roboto-Bold"
+            color="#111111"
+            fontSize={16}
+            lineHeight={24}>
+            Deal lost ({count})
+          </CustomText>
+          <Pressable onPress={() => navigation.navigate('DealLost')}>
+            <CustomText
+              fontFamily="Roboto-Bold"
+              color="#EFC24F"
+              fontSize={14}
+              lineHeight={16}
+              style={{textDecorationLine: 'underline'}}>
+              SEE DEEL LOST
+            </CustomText>
+          </Pressable>
+        </Box>
+      )}
       {vehicleData?.length !== 0 ? (
         <>
           <Box style={styles.flat}>
@@ -219,6 +241,16 @@ const styles = EStyleSheet.create({
   noData: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dealBox: {
+    backgroundColor: 'rgba(239, 194, 79, 0.12)',
+    padding: '2rem',
+    marginTop: '1rem',
+    marginRight: '2rem',
+    marginLeft: '2rem',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
 });

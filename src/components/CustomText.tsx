@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import {Text, TextProps} from 'react-native';
 import {moderateScale} from 'react-native-size-matters';
 import colors from '../utils/colors';
+import {CustomTextProps} from '../types/propTypes';
 
 const FONT_SCALE = 0.3;
 const FONT_OFFSET = 1;

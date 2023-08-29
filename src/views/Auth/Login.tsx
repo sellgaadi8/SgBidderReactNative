@@ -26,6 +26,7 @@ import Loader from '../../components/Loader';
 import {onLogin} from '../../redux/ducks/login';
 import GlobalContext from '../../contexts/GlobalContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {LoginProps} from '../../types/propTypes';
 
 export default function Login({navigation}: LoginProps) {
   const [mobile, setMobile] = useState('');

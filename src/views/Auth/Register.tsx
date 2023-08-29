@@ -27,6 +27,7 @@ import {useAppSelector} from '../../utils/hook';
 import {onLogin} from '../../redux/ducks/login';
 import {onRegister} from '../../redux/ducks/register';
 import GlobalContext from '../../contexts/GlobalContext';
+import {RegisterProps} from '../../types/propTypes';
 
 export default function Register({navigation}: RegisterProps) {
   const [phone, setPhone] = useState('');

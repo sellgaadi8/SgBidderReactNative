@@ -12,6 +12,7 @@ import {Dimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Video from 'react-native-video';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {VehicleCardProps} from '../types/propTypes';
 const {height, width} = Dimensions.get('window');
 
 export default function VehicleCard({
@@ -195,7 +196,7 @@ export default function VehicleCard({
                 fontSize={16}
                 lineHeight={22}
                 fontFamily="Roboto-Medium">
-                Highest Bid: Rs.10,00,000
+                Highest Bid: Rs.{data.highest_bid}
               </CustomText>
             </Box>
           </Box>

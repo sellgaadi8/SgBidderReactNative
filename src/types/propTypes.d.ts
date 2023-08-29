@@ -1,5 +1,5 @@
-// import {RouteProp} from '@react-navigation/native';
-// import {StackNavigationProp} from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 // type LoginProps = {
 //   navigation: StackNavigationProp<RootStackParamList, 'Login'>;
@@ -91,7 +91,8 @@ type AppColors =
   | '#33A02C'
   | '#201A1B'
   | '#1C1B1F'
-  | '#49454F';
+  | '#49454F'
+  | '#EFC24F';
 
 type TextButtonProps = {
   label: string;
@@ -268,4 +269,9 @@ type BidWindowProps = {
   onClose: () => void;
   amounts: {label: string; value: number}[];
   onAddAmount: (value: number) => void;
+};
+
+type OrderChartProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'OrderChart'>;
+  route: RouteProp<RootStackParamList, 'OrderChart'>;
 };

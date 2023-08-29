@@ -1,38 +1,37 @@
 import axiosInstance from '../../axios';
-import {getVehicleUrl} from '../../utils/api';
+import {getCarStatus} from '../../utils/api';
 import {handleError} from '../../utils/helper';
 import {getUserToken} from '../../utils/localStorage';
 import {AppDispatch} from '../store';
 
-const VEHICLE_LIST: VEHICLE_LIST = 'sgSeller/vehicleList';
+const CAR_STATUS: CAR_STATUS = 'sgSeller/carStatus';
 
-const initialState: VehicleListState = {
+const initialState: CarStatusState = {
   called: false,
   success: false,
-  data: [],
   error: false,
+  data: [],
 };
 
 export default (
   state = initialState,
-  action: VehicleListAction,
-): VehicleListState => {
+  action: CarStatusAction,
+): CarStatusState => {
   switch (action.type) {
-    case VEHICLE_LIST:
+    case CAR_STATUS:
       return {...state, ...action.payload};
     default:
       return {...state, called: false};
   }
 };
 
-const vehicleListAction = (res: VehicleListState): VehicleListAction => {
-  return {type: VEHICLE_LIST, payload: {...res, called: true}};
+const carStatusAction = (res: CarStatusState): CarStatusAction => {
+  return {type: CAR_STATUS, payload: {...res, called: true}};
 };
 
-export const onGetVehicleList =
-  (status: string, model: string, vehicle_type: string, page: number) =>
-  async (dispatch: AppDispatch) => {
-    const url = getVehicleUrl(status, model, vehicle_type, page);
+export const getCarStatusDetail =
+  (id: string) => async (dispatch: AppDispatch) => {
+    const url = getCarStatus(id);
     const token = await getUserToken();
 
     const config = {
@@ -40,16 +39,17 @@ export const onGetVehicleList =
         Authorization: `Bearer ${token}`,
       },
     };
+
     axiosInstance
       .get(url, config)
       .then(res => {
-        dispatch(vehicleListAction({...res.data, error: false}));
+        dispatch(carStatusAction({...res.data, error: false}));
       })
       .catch(err => {
         handleError(err, dispatch);
         if (err?.request?._repsonse) {
           dispatch(
-            vehicleListAction({
+            carStatusAction({
               ...JSON.parse(err.request._repsonse),
               error: true,
             }),

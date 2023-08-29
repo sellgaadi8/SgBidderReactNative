@@ -1,5 +1,6 @@
 import React, {useMemo} from 'react';
 import {View, ViewProps} from 'react-native';
+import {BoxProps} from '../types/propTypes';
 
 export default function Box({
   children,

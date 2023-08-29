@@ -16,6 +16,8 @@ import {useAppSelector} from './src/utils/hook';
 import {deleteUserToken} from './src/utils/localStorage';
 import Snackbar from 'react-native-snackbar';
 import Header from './src/components/Header';
+import OrderChart from './src/views/Orders/OrderChart';
+import DealLost from './src/views/Orders/DealLost';
 
 export default function App() {
   const RootStack = createStackNavigator();
@@ -117,6 +119,28 @@ export default function App() {
                   }}
                   component={EditProfile}
                   name="EditProfile"
+                />
+                <RootStack.Screen
+                  options={() => {
+                    return {
+                      header: props => (
+                        <Header title="Car Status" headerProps={props} back />
+                      ),
+                    };
+                  }}
+                  component={OrderChart}
+                  name="OrderChart"
+                />
+                <RootStack.Screen
+                  options={() => {
+                    return {
+                      header: props => (
+                        <Header title="Deals lost" headerProps={props} back />
+                      ),
+                    };
+                  }}
+                  component={DealLost}
+                  name="DealLost"
                 />
               </>
             )}

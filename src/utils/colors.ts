@@ -4,6 +4,7 @@ const colors = {
   textColor: '#ACACAC',
   White: '#FFFFFF',
   secondaryLight: '#FBEECE',
+  green: '#33A02C',
 };
 
 export default colors;

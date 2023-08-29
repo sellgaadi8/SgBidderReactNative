@@ -5,6 +5,7 @@ import colors from '../utils/colors';
 import {contentCenter} from '../utils/styles';
 import CustomText from './CustomText';
 import {pixelSizeHorizontal, pixelSizeVertical} from '../utils/responsive';
+import {PrimaryButtonProps} from '../types/propTypes';
 
 export default function PrimaryButton({
   label,

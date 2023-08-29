@@ -22,6 +22,7 @@ import {container} from '../../utils/styles';
 import Loader from '../../components/Loader';
 import BidWindow from '../../components/BidWindow';
 import {onGlobalChange} from '../../redux/ducks/global';
+import {CarFilterType, ExploreProps} from '../../types/propTypes';
 const {width} = Dimensions.get('window');
 
 const Amounts = [
@@ -58,6 +59,9 @@ export default function LiveAuction({navigation}: ExploreProps) {
       const {data, error} = selectVehicleList;
       if (!error && data) {
         setVehicleData(data);
+        if (data[0].highest_bid) {
+          setAmount(data[0].highest_bid.replace(/,/g, ''));
+        }
       }
     }
   }, [selectVehicleList]);
@@ -95,6 +99,10 @@ export default function LiveAuction({navigation}: ExploreProps) {
           navigation.navigate('VehicleDetail', {
             title: item.model,
             vehicleId: item.uuid,
+            auctionValue: item.auction_value
+              ? item.auction_value
+              : item.ocb_value,
+            isOrder: true,
           })
         }
       />
@@ -146,9 +154,12 @@ export default function LiveAuction({navigation}: ExploreProps) {
   }
 
   function onMinus() {
-    if (+amount !== 0) {
+    if (+amount >= 0) {
       let temp = Number(amount) - 1000;
       setAmount(temp.toString());
+    }
+    if (+amount < 1000) {
+      setAmount('0');
     }
   }
 

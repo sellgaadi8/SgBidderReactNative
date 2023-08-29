@@ -20,6 +20,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {contentCenter} from '../utils/styles';
 import PrimaryButton from './PrimaryButton';
+import {BidWindowProps} from '../types/propTypes';
 const {height, width} = Dimensions.get('window');
 
 export default function BidWindow(props: BidWindowProps & TextInputProps) {
@@ -165,7 +166,7 @@ export default function BidWindow(props: BidWindowProps & TextInputProps) {
                   fontSize={16}
                   lineHeight={22}
                   fontFamily="Roboto-Medium">
-                  Highest Bid: Rs.10,00,000
+                  Highest Bid: Rs.{data.highest_bid}
                 </CustomText>
               </Box>
             </Box>

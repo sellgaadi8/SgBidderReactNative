@@ -20,6 +20,7 @@ import {onOCB} from '../../redux/ducks/oneClickBuy';
 import Snackbar from 'react-native-snackbar';
 import Loader from '../../components/Loader';
 import {container} from '../../utils/styles';
+import {CarFilterType, ExploreProps} from '../../types/propTypes';
 const {width} = Dimensions.get('window');
 
 export default function OCB({navigation}: ExploreProps) {
@@ -101,6 +102,10 @@ export default function OCB({navigation}: ExploreProps) {
           navigation.navigate('VehicleDetail', {
             title: item.model,
             vehicleId: item.uuid,
+            auctionValue: item.auction_value
+              ? item.auction_value
+              : item.ocb_value,
+            isOrder: false,
           })
         }
       />
@@ -172,7 +177,7 @@ const styles = EStyleSheet.create({
     ...container,
   },
   flat: {
-    marginBottom: '20rem',
+    marginBottom: '7rem',
   },
   flatList: {
     padding: '2rem',

@@ -16,6 +16,8 @@ import getVehicleDetails from './getVehicleDetails';
 import getProfile from './getProfile';
 import placebid from './placebid';
 import oneClickBuy from './oneClickBuy';
+import getStatus from './getStatus';
+import getDealLost from './getDealLost';
 
 export default combineReducers({
   login,
@@ -34,4 +36,6 @@ export default combineReducers({
   getProfile,
   placebid,
   oneClickBuy,
+  getStatus,
+  getDealLost,
 });

@@ -7,6 +7,7 @@ import {Image, Pressable} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Dimensions} from 'react-native';
 import {pixelSizeHorizontal, pixelSizeVertical} from '../utils/responsive';
+import {HeaderProps} from '../types/propTypes';
 const {height} = Dimensions.get('window');
 
 export default function Header({

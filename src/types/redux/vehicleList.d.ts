@@ -18,12 +18,16 @@ type Vehicle = {
   auction_value: string;
   auction_ends_at: string;
   extra_info: Object;
+  highest_bid: string;
 };
 
 type VehicleListState = {
   called: boolean;
   success: boolean;
-  data: Vehicle[];
+  data: {
+    vehicle_list: Vehicle[];
+    count: number;
+  };
   error: boolean;
 };
 

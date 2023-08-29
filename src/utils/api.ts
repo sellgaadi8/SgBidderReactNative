@@ -11,15 +11,18 @@ const LOGOUT_URL = '/logout';
 const GET_PROFILE = '/getProfileDetails';
 const PLACE_BID_URL = '/place_bid';
 const OCB_URL = '/buy_now';
+const LOST_DEAL = '/vehicle/getDealsLost';
 
 const getVehicleUrl = (
   vehicle_status: string,
   vehicle_make: string,
   vehicle_type: string,
+  page_no: number,
 ) =>
-  `/vehicle/list?vehicle_status=${vehicle_status}&vehicle_make=${vehicle_make}&vehicle_type=${vehicle_type}`;
+  `/vehicle/list?vehicle_status=${vehicle_status}&vehicle_make=${vehicle_make}&vehicle_type=${vehicle_type}&page_no=${page_no}`;
 
 const getVehicleDetailsUrl = (id: string) => `/vehicle/getVehicleDetails/${id}`;
+const getCarStatus = (id: string) => `/vehicle/getStatusHistory/${id}`;
 
 export {
   LOGIN_SEND_OTP,
@@ -35,6 +38,8 @@ export {
   GET_PROFILE,
   PLACE_BID_URL,
   OCB_URL,
+  LOST_DEAL,
   getVehicleUrl,
   getVehicleDetailsUrl,
+  getCarStatus,
 };
