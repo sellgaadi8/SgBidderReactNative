@@ -168,6 +168,7 @@ type VehicleCardProps = {
   onPlaceBid?: () => void;
   onPressView: () => void;
   isOrder?: boolean;
+  isDealLost?: boolean;
 };
 
 type CustomDropdownProps = {
@@ -274,4 +275,14 @@ type BidWindowProps = {
 type OrderChartProps = {
   navigation: StackNavigationProp<RootStackParamList, 'OrderChart'>;
   route: RouteProp<RootStackParamList, 'OrderChart'>;
+};
+
+type DealLostProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'DealLost'>;
+  route: RouteProp<RootStackParamList, 'DealLost'>;
+};
+
+type ImageViewerCarouselProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'ImageViewerCarousel'>;
+  route: RouteProp<RootStackParamList, 'ImageViewerCarousel'>;
 };

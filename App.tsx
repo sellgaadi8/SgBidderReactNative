@@ -18,6 +18,7 @@ import Snackbar from 'react-native-snackbar';
 import Header from './src/components/Header';
 import OrderChart from './src/views/Orders/OrderChart';
 import DealLost from './src/views/Orders/DealLost';
+import ImageViewerCarousel from './src/views/Explore/ImageViewerCarousel';
 
 export default function App() {
   const RootStack = createStackNavigator();
@@ -141,6 +142,17 @@ export default function App() {
                   }}
                   component={DealLost}
                   name="DealLost"
+                />
+                <RootStack.Screen
+                  options={() => {
+                    return {
+                      header: props => (
+                        <Header title="Images" headerProps={props} back />
+                      ),
+                    };
+                  }}
+                  component={ImageViewerCarousel}
+                  name="ImageViewerCarousel"
                 />
               </>
             )}

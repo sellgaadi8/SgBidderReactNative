@@ -66,29 +66,35 @@ export default function Explore({navigation}: ExploreProps) {
 
   useEffect(() => {
     setLoading(true);
-    dispatch(onGetVehicleList('in_auction', '', '', page));
+    dispatch(
+      onGetVehicleList(activeStatus, filter.modal, filter.vehicleType, page),
+    );
   }, []);
 
   function onChangeTab(index: number, status: string) {
+    setLoading(true);
     setActiveIndex(index);
-    dispatch(onGetVehicleList(status, '', '', page));
     setActiveStatus(status);
     setPage(1);
+    setResetPagination(true);
+    setTotal(0);
+    dispatch(onGetVehicleList(status, filter.modal, filter.vehicleType, page));
   }
 
   useEffect(() => {
     if (selectVehicleList.called) {
-      console.log('called');
-
       setLoading(false);
       const {data, error} = selectVehicleList;
       if (!error && data) {
-        // setVehicleData(data.vehicle_list);
-        if (data && data.vehicle_list && data.vehicle_list[0].highest_bid) {
+        if (
+          data &&
+          data.vehicle_list &&
+          data.count &&
+          vehicleData.length !== data.count
+        ) {
           setResetPagination(false);
           setLoading(false);
           setRefreshing(false);
-          setAmount(data.vehicle_list[0].highest_bid.replace(/,/g, ''));
           const list: Vehicle[] = resetPagination ? [] : [...vehicleData];
           data.vehicle_list.map(item => {
             return list.push({
@@ -117,6 +123,8 @@ export default function Explore({navigation}: ExploreProps) {
           setLoading(false);
           setRefreshing(false);
           setTotal(data.count);
+        } else {
+          setVehicleData([]);
         }
       }
     }
@@ -139,8 +147,11 @@ export default function Explore({navigation}: ExploreProps) {
   }
 
   function applyFilter(selectedFilters: CarFilterType) {
+    setResetPagination(true);
     setFilter(selectedFilters);
     setLoading(true);
+    setVehicleData([]);
+    setShowFilter(false);
     dispatch(
       onGetVehicleList(
         'in_auction',
@@ -155,7 +166,6 @@ export default function Explore({navigation}: ExploreProps) {
         animated: false,
       });
     }
-    setShowFilter(false);
   }
 
   function renderItem({item}: ListRenderItemInfo<Vehicle>) {
@@ -170,7 +180,9 @@ export default function Explore({navigation}: ExploreProps) {
             auctionValue: item.auction_value
               ? item.auction_value
               : item.ocb_value,
-            isOrder: true,
+            isOrder: false,
+            status: item.vehicle_status,
+            highetBid: item.highest_bid,
           })
         }
       />
@@ -254,7 +266,9 @@ export default function Explore({navigation}: ExploreProps) {
   }
 
   function onRefresh() {
-    dispatch(onGetVehicleList(activeStatus, '', '', page));
+    dispatch(
+      onGetVehicleList(activeStatus, filter.modal, filter.vehicleType, page),
+    );
   }
 
   function onLoadMore() {
@@ -289,29 +303,12 @@ export default function Explore({navigation}: ExploreProps) {
         <TopTabs tabs={tabs} activeIndex={activeIndex} />
       </Box>
 
-      <Pressable
-        style={styles.filter}
-        onPress={() => setShowFilter(!showFilter)}>
-        <CustomText
-          fontFamily="Roboto-Medium"
-          color="#201A1B"
-          fontSize={14}
-          lineHeight={16}>
-          Filters
-        </CustomText>
-        <Icon
-          name="filter-variant"
-          size={20}
-          color="#201A1B"
-          style={{marginLeft: 5}}
-        />
-      </Pressable>
       <Box flexDirection="row" ph={'6%'}>
         {filter.modal && (
           <Box style={styles.filterBox}>
             <CustomText
               fontFamily="Roboto-Medium"
-              color="#111111"
+              color="#FFFFFF"
               fontSize={12}
               lineHeight={18}>
               {filter.modal}
@@ -322,14 +319,32 @@ export default function Explore({navigation}: ExploreProps) {
           <Box style={[styles.filterBox, {left: 20}]}>
             <CustomText
               fontFamily="Roboto-Medium"
-              color="#111111"
+              color="#FFFFFF"
               fontSize={12}
               lineHeight={18}>
               {filter.vehicleType.replace(/_/g, ' ')}
             </CustomText>
           </Box>
         )}
+        <Pressable
+          style={styles.filter}
+          onPress={() => setShowFilter(!showFilter)}>
+          <CustomText
+            fontFamily="Roboto-Medium"
+            color="#201A1B"
+            fontSize={14}
+            lineHeight={16}>
+            Filters
+          </CustomText>
+          <Icon
+            name="filter-variant"
+            size={20}
+            color="#201A1B"
+            style={{marginLeft: 5}}
+          />
+        </Pressable>
       </Box>
+
       {vehicleData?.length !== 0 ? (
         <>
           <Box style={styles.flat}>
@@ -449,7 +464,9 @@ const styles = EStyleSheet.create({
   filterBox: {
     borderRadius: 20,
     padding: 5,
-    backgroundColor: 'rgba(239, 194, 79, 0.12)',
+    backgroundColor: '#111111',
     ...contentCenter,
+    marginTop: 10,
+    paddingHorizontal: '1.5rem',
   },
 });

@@ -20,6 +20,7 @@ export default function VehicleCard({
   onPlaceBid,
   onPressView,
   isOrder = true,
+  isDealLost = false,
 }: VehicleCardProps) {
   const calculateRemainingTime = (timeDiff: number) => {
     if (timeDiff <= 0) {
@@ -98,6 +99,17 @@ export default function VehicleCard({
           />
         )}
       </ScrollView>
+      {isDealLost && (
+        <Box style={styles.dealLost}>
+          <CustomText
+            fontSize={12}
+            lineHeight={16}
+            color="#FFFFFF"
+            fontFamily="Roboto-Medium">
+            Deal Lost
+          </CustomText>
+        </Box>
+      )}
 
       <Box style={styles.body}>
         <Box ph={'3%'}>
@@ -179,7 +191,7 @@ export default function VehicleCard({
         </Box>
         <View style={styles.line} />
 
-        {isOrder && data.vehicle_status !== 'one_click_buy' && (
+        {!isDealLost && isOrder && data.vehicle_status !== 'one_click_buy' && (
           <Box>
             <Box style={styles.customerexpected}>
               <CustomText
@@ -260,7 +272,7 @@ export default function VehicleCard({
                 View Details
               </CustomText>
             </Pressable>
-            {isOrder && (
+            {!isDealLost && isOrder && (
               <Pressable style={styles.placebid} onPress={onPlaceBid}>
                 <CustomText
                   fontSize={10}
@@ -383,5 +395,15 @@ const styles = EStyleSheet.create({
   },
   totalPrice: {
     marginLeft: '1rem',
+  },
+  dealLost: {
+    position: 'absolute',
+    backgroundColor: '#FF0000',
+    paddingHorizontal: '4rem',
+    paddingVertical: '0.5rem',
+    top: 0,
+    right: 30,
+    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 8,
   },
 });

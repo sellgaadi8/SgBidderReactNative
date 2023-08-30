@@ -64,7 +64,7 @@ export default function OrderChart({route, navigation}: OrderChartProps) {
 
   return (
     <Box style={styles.container}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Box style={styles.header}>
           <Box style={styles.imageCon}>
             <Image
@@ -116,7 +116,11 @@ export default function OrderChart({route, navigation}: OrderChartProps) {
                         ? 'checkbox-marked-circle'
                         : 'checkbox-blank-circle-outline'
                     }
-                    color={colors.green}
+                    color={
+                      el.created_at !== null
+                        ? colors.green
+                        : 'rgba(17, 17, 17, 0.5)'
+                    }
                     size={20}
                   />
                 </Box>
@@ -159,7 +163,7 @@ const styles = StyleSheet.create({
   },
   line: {
     position: 'absolute',
-    height: '100%',
+    height: '85%',
     width: 1.5,
     backgroundColor: 'rgba(17, 17, 17, 0.5)',
     flexDirection: 'column',

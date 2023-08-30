@@ -51,14 +51,11 @@ export default function Orders({navigation}: OrdersProps) {
   const [vehicleData, setVehicleData] = useState<Vehicle[]>();
   const [loading, setLoading] = useState(false);
   // const [dealLost, setDealLost] = useState<LostDeal[]>([]);
-  const [count, setCount] = useState('');
+  // const [count, setCount] = useState('');
 
   useEffect(() => {
     setLoading(true);
     dispatch(onGetVehicleList('in_negotiation', '', '', 1));
-    if (activeIndex === 0) {
-      // dispatch(getDealLostList());
-    }
   }, []);
 
   function onChangeTab(index: number, status: string) {
@@ -83,11 +80,16 @@ export default function Orders({navigation}: OrdersProps) {
       setLoading(false);
       const {data, error} = selectVehicleList;
       if (!error && data) {
-        setVehicleData(data.vehicle_list);
-        console.log('data', JSON.stringify(data));
+        if (data.vehicle_list) {
+          setVehicleData(data.vehicle_list);
+        } else {
+          setVehicleData([]);
+        }
       }
     }
   }, [selectVehicleList]);
+
+  console.log('===>', vehicleData?.length);
 
   function renderItem({item}: ListRenderItemInfo<Vehicle>) {
     return (
@@ -147,7 +149,7 @@ export default function Orders({navigation}: OrdersProps) {
             color="#111111"
             fontSize={16}
             lineHeight={24}>
-            Deal lost ({count})
+            Deal lost
           </CustomText>
           <Pressable onPress={() => navigation.navigate('DealLost')}>
             <CustomText
@@ -156,7 +158,7 @@ export default function Orders({navigation}: OrdersProps) {
               fontSize={14}
               lineHeight={16}
               style={{textDecorationLine: 'underline'}}>
-              SEE DEEL LOST
+              SEE DEAL LOST
             </CustomText>
           </Pressable>
         </Box>

@@ -23,12 +23,17 @@ import VideoPlayer from '../../components/VideoPlayer';
 import {onGetVehicleDetails} from '../../redux/ducks/getVehicleDetails';
 import {useAppSelector} from '../../utils/hook';
 import RectButtonCustom from '../../components/RectButtonCustom';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
+// import Animated, {
+//   useAnimatedStyle,
+//   useSharedValue,
+//   withSpring,
+// } from 'react-native-reanimated';
 import {VehicleDetailProps} from '../../types/propTypes';
+import {onOCB} from '../../redux/ducks/oneClickBuy';
+import Snackbar from 'react-native-snackbar';
+import {onGetVehicleList} from '../../redux/ducks/vehicleList';
+// import Carousel from 'react-native-snap-carousel';
+// import ImageViewerCarousel from './ImageViewerCarousel';
 const {height, width} = Dimensions.get('window');
 
 export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
@@ -41,6 +46,10 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const [showVideo, setShowVideo] = useState(false);
   const [video, setVideo] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [id, setId] = useState('');
+  const [showBidModal, setShowBidModal] = useState(false);
+  const selectOcb = useAppSelector(state => state.oneClickBuy);
 
   const tabs = [
     {title: 'Documents', onPress: () => onChangeTab(0)},
@@ -79,17 +88,17 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     setActiveIndex(index);
   }
 
-  const translateX = useSharedValue(0);
+  // const translateX = useSharedValue(0);
 
-  useEffect(() => {
-    translateX.value = withSpring((width / 3.5) * activeIndex);
-  }, [activeIndex, translateX]);
+  // useEffect(() => {
+  //   translateX.value = withSpring((width / 3.5) * activeIndex);
+  // }, [activeIndex, translateX]);
 
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{translateX: translateX.value}],
-    };
-  }, []);
+  // const animatedStyles = useAnimatedStyle(() => {
+  //   return {
+  //     transform: [{translateX: translateX.value}],
+  //   };
+  // }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -140,8 +149,25 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
         setImages(imageArray);
       }
     }
+    if (selectOcb.called) {
+      setLoading(false);
+      const {success, message} = selectOcb;
+      if (success) {
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'green',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      } else {
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectVehicleDetails, vehicleDetails]);
+  }, [selectVehicleDetails, vehicleDetails, selectOcb]);
 
   function getExteriorData() {
     const okValue: Partial<{
@@ -200,6 +226,20 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     }
   }
 
+  // function onCloseImageModal() {
+  //   setShowImageModal(false);
+  // }
+
+  function onPlaceBid(el: Vehicle) {
+    if (route.params.status !== 'one_click_buy') {
+      setId(el.uuid);
+      setShowBidModal(true);
+    } else {
+      setLoading(true);
+      dispatch(onOCB(el.uuid));
+    }
+  }
+
   return (
     <Box style={styles.container}>
       {loading && <Loader />}
@@ -231,11 +271,13 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                     </Box>
                   ) : (
                     el && (
-                      <Image
-                        source={{uri: el}}
-                        style={styles.images}
-                        resizeMode="cover"
-                      />
+                      <Pressable onPress={() => setShowImageModal(true)}>
+                        <Image
+                          source={{uri: el}}
+                          style={styles.images}
+                          resizeMode="cover"
+                        />
+                      </Pressable>
                     )
                   )}
                 </Box>
@@ -326,15 +368,17 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                 Customer expected price: Rs.{route.params.auctionValue}
               </CustomText>
             </Box>
-            <Box style={styles.highestbid}>
-              <CustomText
-                color="#FFFFFF"
-                fontSize={16}
-                lineHeight={22}
-                fontFamily="Roboto-Medium">
-                Highest Bid: Rs.10,00,000
-              </CustomText>
-            </Box>
+            {route.params.status === 'in_auction' && (
+              <Box style={styles.highestbid}>
+                <CustomText
+                  color="#FFFFFF"
+                  fontSize={16}
+                  lineHeight={22}
+                  fontFamily="Roboto-Medium">
+                  Highest Bid: {route.params.highetBid}
+                </CustomText>
+              </Box>
+            )}
           </Box>
           <Box style={styles.tabBg}>
             <ScrollView horizontal showsHorizontalScrollIndicator={true}>
@@ -358,9 +402,9 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                 );
               })}
             </ScrollView>
-            <View style={styles.lineContainer}>
+            {/* <View style={styles.lineContainer}>
               <Animated.View style={[styles.dash, animatedStyles]} />
-            </View>
+            </View> */}
           </Box>
 
           <Box style={styles.body}>
@@ -595,9 +639,38 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
         position="bottom">
         <VideoPlayer video={video} onPressClose={onClosedVideo} />
       </Modal>
+      {/* <Modal
+        isOpen={showImageModal}
+        onClosed={onCloseImageModal}
+        style={styles.modal}
+        position="bottom">
+        <ImageViewerCarousel />
+      </Modal> */}
       {!route.params.isOrder && (
         <Box style={styles.bottom}>
-          <CustomText>Closing Price</CustomText>
+          <Box
+            flexDirection="row"
+            justifyContent="space-evenly"
+            alignItems="center">
+            <CustomText
+              color="#33A02C"
+              fontSize={14}
+              lineHeight={20}
+              fontFamily="Roboto-Medium">
+              Closing Price - Rs.{route.params.auctionValue}
+            </CustomText>
+            <Pressable style={styles.placebid} onPress={onPlaceBid}>
+              <CustomText
+                fontSize={12}
+                lineHeight={16}
+                color="#111111"
+                fontFamily="Roboto-Medium">
+                {route.params.status === 'one_click_buy'
+                  ? 'Buy Now'
+                  : ' Place bid'}
+              </CustomText>
+            </Pressable>
+          </Box>
         </Box>
       )}
     </Box>
@@ -715,5 +788,12 @@ const styles = EStyleSheet.create({
     width: width / 3,
     backgroundColor: colors.secondary,
     height: 3,
+  },
+  placebid: {
+    padding: '0.5rem',
+    backgroundColor: colors.secondary,
+    borderRadius: 15,
+    width: 100,
+    ...contentCenter,
   },
 });

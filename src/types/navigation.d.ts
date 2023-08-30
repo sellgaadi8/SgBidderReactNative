@@ -10,11 +10,17 @@ type RootStackParamList = {
     vehicleId: string;
     auctionValue: string | null;
     isOrder: boolean;
+    status?: string;
+    highetBid?: string;
   };
   EditProfile: undefined;
   ExploreStack: undefined;
   OrderChart: {vehicleData: Vehicle};
   DealLost: undefined;
+  ImageViewerCarousel: {
+    data: {key: string; value: string}[];
+    index: number;
+  };
 };
 
 type BottomStackParamList = {

@@ -17,6 +17,7 @@ import EStyleSheet from 'react-native-extended-stylesheet';
 import colors from '../utils/colors';
 import Loader from './Loader';
 import {getMakeList} from '../redux/ducks/getMake';
+import {CarFilterType, FilterProps, ModalType} from '../types/propTypes';
 const {width, height} = Dimensions.get('window');
 
 export default function Filter({
@@ -51,8 +52,9 @@ export default function Filter({
         setMake(data);
         setLoading(true);
         dispatch(getModelList(data));
-        setTempFilter({modal: '', vehicleType: ''});
-        setTempFilter;
+        const _tempFilterModal = {...tempFilter};
+        _tempFilterModal.modal = '';
+        setTempFilter(_tempFilterModal);
         break;
       case 'Model':
         const _tempFilter = {...tempFilter};
