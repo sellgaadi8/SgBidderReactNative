@@ -23,9 +23,14 @@ import PrimaryButton from './PrimaryButton';
 import {BidWindowProps} from '../types/propTypes';
 const {height, width} = Dimensions.get('window');
 
+const Amounts = [
+  {label: '5000', value: '5000'},
+  {label: '10,000', value: '10000'},
+  {label: '2,00,000', value: '200000'},
+];
+
 export default function BidWindow(props: BidWindowProps & TextInputProps) {
-  const {data, onPlaceBid, onPlus, onMinus, onClose, amounts, onAddAmount} =
-    props;
+  const {data, onPlaceBid, onPlus, onMinus, onClose, onAddAmount} = props;
   return (
     <Box>
       <KeyboardAvoidingView>
@@ -222,7 +227,7 @@ export default function BidWindow(props: BidWindowProps & TextInputProps) {
               </Pressable>
             </Box>
             <Box flexDirection="row" justifyContent="space-around" pv={'2%'}>
-              {amounts.map((el, index) => {
+              {Amounts.map((el, index) => {
                 return (
                   <Pressable
                     key={index.toString()}

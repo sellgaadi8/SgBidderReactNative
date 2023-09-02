@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  // BackHandler,
   Dimensions,
   FlatList,
   ListRenderItemInfo,
@@ -30,12 +31,6 @@ import {onOCB} from '../../redux/ducks/oneClickBuy';
 import {contentCenter} from '../../utils/styles';
 const {width} = Dimensions.get('window');
 
-const Amounts = [
-  {label: '5000', value: 5000},
-  {label: '10,000', value: '10000'},
-  {label: '2,00,000', value: '200000'},
-];
-
 export default function Explore({navigation}: ExploreProps) {
   const tabs = [
     {title: 'LIVE AUCTION', onPress: () => onChangeTab(0, 'in_auction')},
@@ -62,16 +57,31 @@ export default function Explore({navigation}: ExploreProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [resetPagination, setResetPagination] = useState(false);
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState<Number | null>(null);
+  const [total, setTotal] = useState<number | null>(null);
+  const [enabelTab, setEnableTab] = useState(true);
 
   useEffect(() => {
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  }, []);
+
+  function onFocus() {
     setLoading(true);
+    getData();
+    setResetPagination(true);
+  }
+
+  function getData() {
+    setEnableTab(false);
     dispatch(
       onGetVehicleList(activeStatus, filter.modal, filter.vehicleType, page),
     );
-  }, []);
+  }
 
   function onChangeTab(index: number, status: string) {
+    setEnableTab(false);
     setLoading(true);
     setActiveIndex(index);
     setActiveStatus(status);
@@ -83,49 +93,48 @@ export default function Explore({navigation}: ExploreProps) {
 
   useEffect(() => {
     if (selectVehicleList.called) {
+      setEnableTab(true);
       setLoading(false);
-      const {data, error} = selectVehicleList;
-      if (!error && data) {
-        if (
-          data &&
-          data.vehicle_list &&
-          data.count &&
-          vehicleData.length !== data.count
-        ) {
-          setResetPagination(false);
-          setLoading(false);
-          setRefreshing(false);
-          const list: Vehicle[] = resetPagination ? [] : [...vehicleData];
-          data.vehicle_list.map(item => {
-            return list.push({
-              make: item.make,
-              color: item.color,
-              model: item.model,
-              variant: item.variant,
-              mfg_year: item.mfg_year,
-              reg_date: item.reg_date,
-              fuel_type: item.fuel_type,
-              no_of_kms: item.no_of_kms,
-              no_of_owners: item.no_of_owners,
-              transmission: item.transmission,
-              uuid: item.uuid,
-              images: item.images,
-              vehicle_status: item.vehicle_status,
-              ocb_value: item.ocb_value,
-              auction_value: item.auction_value,
-              auction_ends_at: item.auction_ends_at,
-              extra_info: item.extra_info,
-              highest_bid: item.highest_bid,
-            });
+      const {data, success} = selectVehicleList;
+      if (!success) {
+        setResetPagination(false);
+        setLoading(false);
+        setRefreshing(false);
+      }
+      if (
+        data &&
+        data.vehicle_list &&
+        data.count &&
+        vehicleData.length !== data.count
+      ) {
+        const list: Vehicle[] = resetPagination ? [] : [...vehicleData];
+        data.vehicle_list.map(item => {
+          return list.push({
+            make: item.make,
+            color: item.color,
+            model: item.model,
+            variant: item.variant,
+            mfg_year: item.mfg_year,
+            reg_date: item.reg_date,
+            fuel_type: item.fuel_type,
+            no_of_kms: item.no_of_kms,
+            no_of_owners: item.no_of_owners,
+            transmission: item.transmission,
+            uuid: item.uuid,
+            images: item.images,
+            vehicle_status: item.vehicle_status,
+            ocb_value: item.ocb_value,
+            auction_value: item.auction_value,
+            auction_ends_at: item.auction_ends_at,
+            extra_info: item.extra_info,
+            highest_bid: item.highest_bid,
           });
-          setVehicleData(list);
-          setResetPagination(false);
-          setLoading(false);
-          setRefreshing(false);
-          setTotal(data.count);
-        } else {
-          setVehicleData([]);
-        }
+        });
+        setVehicleData(list);
+        setResetPagination(false);
+        setLoading(false);
+        setRefreshing(false);
+        setTotal(data.count);
       }
     }
   }, [selectVehicleList, page, activeIndex]);
@@ -138,6 +147,9 @@ export default function Explore({navigation}: ExploreProps) {
       dispatch(onGlobalChange({showBottomTabs: false}));
     } else {
       setLoading(true);
+      setResetPagination(true);
+      setRefreshing(true);
+      setVehicleData([]);
       dispatch(onOCB(el.uuid));
     }
   }
@@ -147,6 +159,7 @@ export default function Explore({navigation}: ExploreProps) {
   }
 
   function applyFilter(selectedFilters: CarFilterType) {
+    setEnableTab(false);
     setResetPagination(true);
     setFilter(selectedFilters);
     setLoading(true);
@@ -183,6 +196,7 @@ export default function Explore({navigation}: ExploreProps) {
             isOrder: false,
             status: item.vehicle_status,
             highetBid: item.highest_bid,
+            data: item,
           })
         }
       />
@@ -196,6 +210,9 @@ export default function Explore({navigation}: ExploreProps) {
 
   function onSubmitBid() {
     if (+amount > 1000) {
+      setResetPagination(true);
+      setRefreshing(true);
+      setVehicleData([]);
       dispatch(onPlaceVehicleBid(id, amount));
     } else {
       Snackbar.show({
@@ -209,15 +226,11 @@ export default function Explore({navigation}: ExploreProps) {
   useEffect(() => {
     if (selectOnBid.called) {
       setLoading(false);
-      const {message, success} = selectOnBid;
+      const {success} = selectOnBid;
       if (success) {
+        setResetPagination(true);
         setShowBidModal(false);
-        setAmount('');
-        Snackbar.show({
-          text: message,
-          backgroundColor: 'green',
-          duration: Snackbar.LENGTH_SHORT,
-        });
+        navigation.navigate('SuccessPage');
       } else {
         Snackbar.show({
           text: 'Your Bid is Lower than the last placed bid.',
@@ -230,12 +243,13 @@ export default function Explore({navigation}: ExploreProps) {
       setLoading(false);
       const {success, message} = selectOcb;
       if (success) {
+        setResetPagination(true);
+        getData();
         Snackbar.show({
           text: message,
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });
-        dispatch(onGetVehicleList('one_click_buy', '', '', page));
       } else {
         Snackbar.show({
           text: message,
@@ -261,21 +275,26 @@ export default function Explore({navigation}: ExploreProps) {
     }
   }
 
-  function onAddAmount(value: number) {
+  function onAddAmount(value: string) {
     setAmount(value.toString());
   }
 
   function onRefresh() {
+    setLoading(true);
+    setResetPagination(true);
+    setRefreshing(true);
+    setVehicleData([]);
     dispatch(
       onGetVehicleList(activeStatus, filter.modal, filter.vehicleType, page),
     );
   }
 
   function onLoadMore() {
-    if (total !== null && vehicleData.length < total) {
+    if (total !== null && total < vehicleData.length) {
       const nextPage = page + 1;
       setLoading(true);
       setPage(nextPage);
+      setEnableTab(false);
       dispatch(onGetVehicleList(activeStatus, '', '', page));
     } else {
       setPage(1);
@@ -300,7 +319,7 @@ export default function Explore({navigation}: ExploreProps) {
             <Icon name="bell-outline" size={25} color="#FFFFFF" />
           </Pressable>
         </Box>
-        <TopTabs tabs={tabs} activeIndex={activeIndex} />
+        <TopTabs tabs={tabs} activeIndex={activeIndex} tabEnabled={enabelTab} />
       </Box>
 
       <Box flexDirection="row" ph={'6%'}>
@@ -401,7 +420,6 @@ export default function Explore({navigation}: ExploreProps) {
           onPlus={onPlus}
           value={amount}
           onChangeText={setAmount}
-          amounts={Amounts}
           onAddAmount={onAddAmount}
         />
       </Modal>

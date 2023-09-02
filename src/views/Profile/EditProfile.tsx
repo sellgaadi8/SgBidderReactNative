@@ -18,8 +18,10 @@ import GlobalContext from '../../contexts/GlobalContext';
 import {onUpdateProfile} from '../../redux/ducks/updateProfile';
 import {useAppSelector} from '../../utils/hook';
 import {isEmailValid, isNameValid} from '../../utils/regex';
+import {EditProfileProps} from '../../types/propTypes';
+import {onGetProfile} from '../../redux/ducks/getProfile';
 
-export default function EditProfile({navigation, route}: EditProfileProps) {
+export default function EditProfile({navigation}: EditProfileProps) {
   const [name, setName] = useState('');
   const [address1, setAddress1] = useState('');
   const [gst, setGst] = useState('');
@@ -27,10 +29,19 @@ export default function EditProfile({navigation, route}: EditProfileProps) {
   const [adhar, setAdhar] = useState('');
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [errors, setErrors] = useState<EditProfileErrors>();
-  const {userPhone} = useContext(GlobalContext);
-  const dipatch = useDispatch<any>();
+  const {userPhone, isFirstTime} = useContext(GlobalContext);
+  const dispatch = useDispatch<any>();
   const selectProfileUpate = useAppSelector(state => state.updateProfile);
+  const selectGetProfile = useAppSelector(state => state.getProfile);
+
+  console.log('isFirstTime', isFirstTime);
+
+  useEffect(() => {
+    dispatch(onGetProfile());
+    setPhone(userPhone);
+  }, []);
 
   function validateInputs() {
     const tempErrors: EditProfileErrors = {};
@@ -52,7 +63,7 @@ export default function EditProfile({navigation, route}: EditProfileProps) {
     Keyboard.dismiss();
     if (isValid) {
       setLoading(true);
-      dipatch(onUpdateProfile(name, gst, pan, adhar, email, address1));
+      dispatch(onUpdateProfile(name, gst, pan, adhar, email, address1));
     }
   }
 
@@ -69,7 +80,31 @@ export default function EditProfile({navigation, route}: EditProfileProps) {
         navigation.navigate('ExploreStack');
       }
     }
-  }, [selectProfileUpate]);
+    if (selectGetProfile.called) {
+      const {data, success} = selectGetProfile;
+      if (success && data) {
+        if (data.dealership_name) {
+          setName(data.dealership_name);
+        }
+        setPhone(data.mobile);
+        if (data.email) {
+          setEmail(data.email);
+        }
+        if (data.dealership_address) {
+          setAddress1(data.dealership_address);
+        }
+        if (data.gst_no) {
+          setGst(data.gst_no);
+        }
+        if (data.aadhar_no) {
+          setAdhar(data.aadhar_no);
+        }
+        if (data.business_pan) {
+          setPan(data.business_pan);
+        }
+      }
+    }
+  }, [selectProfileUpate, selectGetProfile]);
 
   function onSkip() {
     navigation.navigate('ExploreStack');
@@ -92,7 +127,12 @@ export default function EditProfile({navigation, route}: EditProfileProps) {
 
         <Input label="Address" value={address1} onChangeText={setAddress1} />
 
-        <Input label="Mobile*" value={userPhone} editable={false} />
+        <Input
+          label="Mobile*"
+          value={phone}
+          onChangeText={setPhone}
+          editable={false}
+        />
 
         <Input
           label="Email*"
@@ -123,14 +163,25 @@ export default function EditProfile({navigation, route}: EditProfileProps) {
           maxLength={12}
           keyboardType="numeric"
         />
-        <Box style={styles.buttonContainer}>
-          <Box width={'45%'}>
+        {isFirstTime ? (
+          <Box style={[styles.buttonContainer]}>
+            <Box width={'45%'}>
+              <PrimaryButton label="Update" onPress={update} />
+            </Box>
+
+            <Box width={'45%'} ph={'1%'}>
+              <PrimaryButton
+                label="Skip"
+                onPress={onSkip}
+                varient="Secondary"
+              />
+            </Box>
+          </Box>
+        ) : (
+          <Box width={'45%'} alignSelf="center" pv={'5%'}>
             <PrimaryButton label="Update" onPress={update} />
           </Box>
-          <Box width={'45%'}>
-            <PrimaryButton label="Skip" onPress={onSkip} varient="Secondary" />
-          </Box>
-        </Box>
+        )}
       </ScrollView>
     </Box>
   );
@@ -151,6 +202,6 @@ const styles = EStyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: '4rem',
-    marginTop: '1rem',
+    marginTop: '2rem',
   },
 });

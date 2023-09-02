@@ -103,8 +103,9 @@ export default function Login({navigation}: LoginProps) {
       } else if (is_register === 1) {
         setUserPhone(mobile);
         setAuthenticated(true);
+        setIsFirstTime(true);
         setTimeout(() => {
-          navigation.navigate('EditProfile', {isRegister: true});
+          navigation.navigate('EditProfile');
         }, 1000);
       } else if (!success) {
         Snackbar.show({

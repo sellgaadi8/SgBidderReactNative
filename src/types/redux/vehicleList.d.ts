@@ -26,6 +26,7 @@ type VehicleListState = {
   success: boolean;
   data: {
     vehicle_list: Vehicle[];
+    deals_lost_list: Vehicle[] | null;
     count: number;
   };
   error: boolean;

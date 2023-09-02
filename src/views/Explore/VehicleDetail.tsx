@@ -31,7 +31,8 @@ import RectButtonCustom from '../../components/RectButtonCustom';
 import {VehicleDetailProps} from '../../types/propTypes';
 import {onOCB} from '../../redux/ducks/oneClickBuy';
 import Snackbar from 'react-native-snackbar';
-import {onGetVehicleList} from '../../redux/ducks/vehicleList';
+import BidWindow from '../../components/BidWindow';
+import {onPlaceVehicleBid} from '../../redux/ducks/placebid';
 // import Carousel from 'react-native-snap-carousel';
 // import ImageViewerCarousel from './ImageViewerCarousel';
 const {height, width} = Dimensions.get('window');
@@ -46,10 +47,12 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const [showVideo, setShowVideo] = useState(false);
   const [video, setVideo] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showImageModal, setShowImageModal] = useState(false);
+  // const [showImageModal, setShowImageModal] = useState(false);
   const [id, setId] = useState('');
   const [showBidModal, setShowBidModal] = useState(false);
+  const [amount, setAmount] = useState('');
   const selectOcb = useAppSelector(state => state.oneClickBuy);
+  const selectOnBid = useAppSelector(state => state.placebid);
 
   const tabs = [
     {title: 'Documents', onPress: () => onChangeTab(0)},
@@ -158,6 +161,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });
+        navigation.goBack();
       } else {
         Snackbar.show({
           text: message,
@@ -166,8 +170,28 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
         });
       }
     }
+    if (selectOnBid.called) {
+      setLoading(false);
+      const {message, success} = selectOnBid;
+      if (success) {
+        setShowBidModal(false);
+        setAmount('');
+        Snackbar.show({
+          text: message,
+          backgroundColor: 'green',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+        dispatch(onGetVehicleDetails(route.params.data.uuid));
+      } else {
+        Snackbar.show({
+          text: 'Your Bid is Lower than the last placed bid.',
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectVehicleDetails, vehicleDetails, selectOcb]);
+  }, [selectVehicleDetails, vehicleDetails, selectOcb, selectOnBid]);
 
   function getExteriorData() {
     const okValue: Partial<{
@@ -231,12 +255,47 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   // }
 
   function onPlaceBid(el: Vehicle) {
-    if (route.params.status !== 'one_click_buy') {
+    if (vehicleDetails?.vehicle.vehicle_status !== 'one_click_buy') {
       setId(el.uuid);
       setShowBidModal(true);
     } else {
       setLoading(true);
       dispatch(onOCB(el.uuid));
+    }
+  }
+
+  function onCloseBidModal() {
+    setShowBidModal(false);
+  }
+
+  function onPlus() {
+    let temp = 1000 + Number(amount);
+    setAmount(temp.toString());
+  }
+
+  function onMinus() {
+    if (+amount >= 0) {
+      let temp = Number(amount) - 1000;
+      setAmount(temp.toString());
+    }
+    if (+amount < 1000) {
+      setAmount('0');
+    }
+  }
+
+  function onAddAmount(value: string) {
+    setAmount(value.toString());
+  }
+
+  function onSubmitBid() {
+    if (+amount > 1000) {
+      dispatch(onPlaceVehicleBid(id, amount));
+    } else {
+      Snackbar.show({
+        text: 'Please enter a valid bid amount',
+        backgroundColor: 'red',
+        duration: Snackbar.LENGTH_SHORT,
+      });
     }
   }
 
@@ -271,7 +330,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                     </Box>
                   ) : (
                     el && (
-                      <Pressable onPress={() => setShowImageModal(true)}>
+                      <Pressable>
                         <Image
                           source={{uri: el}}
                           style={styles.images}
@@ -365,17 +424,18 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                 fontSize={14}
                 lineHeight={22}
                 fontFamily="Roboto-Medium">
-                Customer expected price: Rs.{route.params.auctionValue}
+                Customer expected price: Rs.
+                {vehicleDetails?.vehicle.auction_value}
               </CustomText>
             </Box>
-            {route.params.status === 'in_auction' && (
+            {vehicleDetails?.vehicle.vehicle_status === 'in_auction' && (
               <Box style={styles.highestbid}>
                 <CustomText
                   color="#FFFFFF"
                   fontSize={16}
                   lineHeight={22}
                   fontFamily="Roboto-Medium">
-                  Highest Bid: {route.params.highetBid}
+                  Highest Bid: {vehicleDetails?.vehicle.highest_bid}
                 </CustomText>
               </Box>
             )}
@@ -639,13 +699,22 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
         position="bottom">
         <VideoPlayer video={video} onPressClose={onClosedVideo} />
       </Modal>
-      {/* <Modal
-        isOpen={showImageModal}
-        onClosed={onCloseImageModal}
-        style={styles.modal}
-        position="bottom">
-        <ImageViewerCarousel />
-      </Modal> */}
+      <Modal
+        isOpen={showBidModal}
+        onClosed={onCloseBidModal}
+        style={styles.bidModal}
+        position="center">
+        <BidWindow
+          data={route.params.data}
+          onClose={onCloseBidModal}
+          onMinus={onMinus}
+          onPlaceBid={onSubmitBid}
+          onPlus={onPlus}
+          value={amount}
+          onChangeText={setAmount}
+          onAddAmount={onAddAmount}
+        />
+      </Modal>
       {!route.params.isOrder && (
         <Box style={styles.bottom}>
           <Box
@@ -657,15 +726,17 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
               fontSize={14}
               lineHeight={20}
               fontFamily="Roboto-Medium">
-              Closing Price - Rs.{route.params.auctionValue}
+              Closing Price - Rs.{vehicleDetails?.vehicle.auction_value}
             </CustomText>
-            <Pressable style={styles.placebid} onPress={onPlaceBid}>
+            <Pressable
+              style={styles.placebid}
+              onPress={() => onPlaceBid(route.params.data)}>
               <CustomText
                 fontSize={12}
                 lineHeight={16}
                 color="#111111"
                 fontFamily="Roboto-Medium">
-                {route.params.status === 'one_click_buy'
+                {vehicleDetails?.vehicle.vehicle_status === 'one_click_buy'
                   ? 'Buy Now'
                   : ' Place bid'}
               </CustomText>
@@ -795,5 +866,11 @@ const styles = EStyleSheet.create({
     borderRadius: 15,
     width: 100,
     ...contentCenter,
+  },
+  bidModal: {
+    height: 'auto',
+    backgroundColor: '#FFFFFF',
+    width: width * 0.9,
+    borderRadius: 8,
   },
 });

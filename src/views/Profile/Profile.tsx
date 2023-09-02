@@ -21,6 +21,7 @@ import {deleteUserToken, saveTokenValidity} from '../../utils/localStorage';
 import Globals from '../../utils/globals';
 import {useAppSelector} from '../../utils/hook';
 import {onGetProfile} from '../../redux/ducks/getProfile';
+import {ProfileProps} from '../../types/propTypes';
 
 const Button = [
   {name: 'Personal details', detail: 'Edit & review personal details'},

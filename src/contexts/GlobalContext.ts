@@ -5,6 +5,7 @@ const GlobalContext = React.createContext<AppContext>({
   setIsFirstTime: () => {},
   setUserPhone: () => {},
   userPhone: '',
+  isFirstTime: false,
 });
 
 export default GlobalContext;

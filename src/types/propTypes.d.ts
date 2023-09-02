@@ -263,13 +263,12 @@ type EditProfileProps = {
 };
 
 type BidWindowProps = {
-  data: Vehicle;
+  data: Vehicle | undefined;
   onPlaceBid: () => void;
   onPlus: () => void;
   onMinus: () => void;
   onClose: () => void;
-  amounts: {label: string; value: number}[];
-  onAddAmount: (value: number) => void;
+  onAddAmount: (value: string) => void;
 };
 
 type OrderChartProps = {
@@ -285,4 +284,9 @@ type DealLostProps = {
 type ImageViewerCarouselProps = {
   navigation: StackNavigationProp<RootStackParamList, 'ImageViewerCarousel'>;
   route: RouteProp<RootStackParamList, 'ImageViewerCarousel'>;
+};
+
+type SuccessPageProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'SuccessPage'>;
+  route: RouteProp<RootStackParamList, 'SuccessPage'>;
 };

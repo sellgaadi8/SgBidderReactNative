@@ -19,6 +19,7 @@ import CustomText from './CustomText';
 import colors from '../utils/colors';
 import {fontPixel} from '../utils/responsive';
 import TextButton from './TextButton';
+import {InputProps} from '../types/propTypes';
 
 export default function Input(props: TextInputProps & InputProps) {
   const {

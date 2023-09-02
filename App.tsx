@@ -19,6 +19,7 @@ import Header from './src/components/Header';
 import OrderChart from './src/views/Orders/OrderChart';
 import DealLost from './src/views/Orders/DealLost';
 import ImageViewerCarousel from './src/views/Explore/ImageViewerCarousel';
+import SuccessPage from './src/views/Explore/SuccessPage';
 
 export default function App() {
   const RootStack = createStackNavigator();
@@ -26,8 +27,6 @@ export default function App() {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [userPhone, setUserPhone] = useState('');
   const selectLogoutState = useAppSelector(state => state.logout);
-
-  console.log('isFirstTime', isFirstTime);
 
   useEffect(() => {
     if (selectLogoutState.called) {
@@ -53,6 +52,7 @@ export default function App() {
         setIsFirstTime,
         setUserPhone,
         userPhone,
+        isFirstTime,
       }}>
       <SafeAreaView style={styles.container}>
         <NavigationContainer>
@@ -114,7 +114,11 @@ export default function App() {
                   options={() => {
                     return {
                       header: props => (
-                        <Header title="Update Profile" headerProps={props} />
+                        <Header
+                          title="Update Profile"
+                          headerProps={props}
+                          back={isFirstTime ? false : true}
+                        />
                       ),
                     };
                   }}
@@ -153,6 +157,11 @@ export default function App() {
                   }}
                   component={ImageViewerCarousel}
                   name="ImageViewerCarousel"
+                />
+                <RootStack.Screen
+                  options={{headerShown: false}}
+                  component={SuccessPage}
+                  name="SuccessPage"
                 />
               </>
             )}

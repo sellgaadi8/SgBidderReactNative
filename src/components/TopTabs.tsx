@@ -14,11 +14,16 @@ import RectButtonCustom from './RectButtonCustom';
 type TopTabsProps = {
   tabs: {title: string; onPress: () => void}[];
   activeIndex: number;
+  tabEnabled?: boolean;
 };
 
 const {width} = Dimensions.get('screen');
 
-export default function TopTabs({tabs, activeIndex}: TopTabsProps) {
+export default function TopTabs({
+  tabs,
+  activeIndex,
+  tabEnabled = true,
+}: TopTabsProps) {
   const translateX = useSharedValue(0);
 
   useEffect(() => {
@@ -39,7 +44,8 @@ export default function TopTabs({tabs, activeIndex}: TopTabsProps) {
             <RectButtonCustom
               key={idx}
               onPress={el.onPress}
-              style={styles.touchable}>
+              style={styles.touchable}
+              enabled={tabEnabled}>
               <CustomText
                 color={idx === activeIndex ? '#FFFFFF' : '#5D5D5D'}
                 fontFamily={

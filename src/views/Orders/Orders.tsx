@@ -5,6 +5,7 @@ import {
   FlatList,
   ListRenderItemInfo,
   Pressable,
+  RefreshControl,
   ScrollView,
   View,
 } from 'react-native';
@@ -50,16 +51,27 @@ export default function Orders({navigation}: OrdersProps) {
   const selectVehicleList = useAppSelector(state => state.vechicleList);
   const [vehicleData, setVehicleData] = useState<Vehicle[]>();
   const [loading, setLoading] = useState(false);
-  // const [dealLost, setDealLost] = useState<LostDeal[]>([]);
-  // const [count, setCount] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [dealLost, setDealLost] = useState<Vehicle[]>([]);
+  const [count, setCount] = useState<number | null>(null);
+  const [activeStatus, setActiveStatus] = useState('in_negotiation');
 
   useEffect(() => {
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  }, []);
+
+  function onFocus() {
     setLoading(true);
     dispatch(onGetVehicleList('in_negotiation', '', '', 1));
-  }, []);
+    dispatch(onGetVehicleList('deal_lost', '', '', 1));
+  }
 
   function onChangeTab(index: number, status: string) {
     setActiveIndex(index);
+    setActiveStatus(status);
     setLoading(true);
     dispatch(onGetVehicleList(status, '', '', 1));
   }
@@ -78,18 +90,20 @@ export default function Orders({navigation}: OrdersProps) {
   useEffect(() => {
     if (selectVehicleList.called) {
       setLoading(false);
+      setRefreshing(false);
       const {data, error} = selectVehicleList;
       if (!error && data) {
         if (data.vehicle_list) {
           setVehicleData(data.vehicle_list);
+        } else if (data.deals_lost_list) {
+          setDealLost(data.deals_lost_list);
+          setCount(data.count);
         } else {
           setVehicleData([]);
         }
       }
     }
   }, [selectVehicleList]);
-
-  console.log('===>', vehicleData?.length);
 
   function renderItem({item}: ListRenderItemInfo<Vehicle>) {
     return (
@@ -101,6 +115,10 @@ export default function Orders({navigation}: OrdersProps) {
         isOrder={false}
       />
     );
+  }
+
+  function onRefresh() {
+    dispatch(onGetVehicleList(activeStatus, '', '', 1));
   }
 
   return (
@@ -142,16 +160,17 @@ export default function Orders({navigation}: OrdersProps) {
           </View>
         </ScrollView>
       </Box>
-      {activeIndex === 0 && (
+      {dealLost.length !== 0 && activeIndex === 0 && (
         <Box style={styles.dealBox}>
           <CustomText
             fontFamily="Roboto-Bold"
             color="#111111"
             fontSize={16}
             lineHeight={24}>
-            Deal lost
+            Deal lost ({count})
           </CustomText>
-          <Pressable onPress={() => navigation.navigate('DealLost')}>
+          <Pressable
+            onPress={() => navigation.navigate('DealLost', {data: dealLost})}>
             <CustomText
               fontFamily="Roboto-Bold"
               color="#EFC24F"
@@ -170,6 +189,9 @@ export default function Orders({navigation}: OrdersProps) {
               data={vehicleData}
               renderItem={renderItem}
               contentContainerStyle={styles.flatList}
+              refreshControl={
+                <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+              }
             />
           </Box>
         </>
@@ -235,7 +257,7 @@ const styles = EStyleSheet.create({
     height: 3,
   },
   flat: {
-    marginBottom: '20rem',
+    marginBottom: '22rem',
   },
   flatList: {
     padding: '2rem',
