@@ -71,6 +71,7 @@ export default function Explore({navigation}: ExploreProps) {
     setLoading(true);
     getData();
     setResetPagination(true);
+    setVehicleData([]);
   }
 
   function getData() {

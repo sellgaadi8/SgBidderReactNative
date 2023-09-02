@@ -103,6 +103,49 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   //   };
   // }, []);
 
+  const calculateRemainingTime = (timeDiff: number) => {
+    if (timeDiff <= 0) {
+      return '00:00:00';
+    }
+
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const targetDateString = vehicleDetails?.vehicle.auction_ends_at || ''; // Handle null or undefined target date
+  const targetDate = new Date(targetDateString);
+  const currentTime = new Date();
+
+  const [remainingTime, setRemainingTime] = useState(
+    targetDateString
+      ? calculateRemainingTime(targetDate.getTime() - currentTime.getTime())
+      : '00:00:00',
+  );
+
+  useEffect(() => {
+    if (!targetDateString) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const updatedNow = new Date();
+      const updatedTimeDifference = targetDate.getTime() - updatedNow.getTime();
+      setRemainingTime(calculateRemainingTime(updatedTimeDifference));
+
+      if (updatedTimeDifference <= 0) {
+        clearInterval(interval);
+        setRemainingTime('00:00:00');
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetDateString]);
+
   useEffect(() => {
     setLoading(true);
     dispatch(onGetVehicleDetails(route.params.vehicleId));
@@ -161,7 +204,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });
-        navigation.goBack();
+        navigation.navigate('BottomNavigation');
       } else {
         Snackbar.show({
           text: message,
@@ -172,16 +215,11 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     }
     if (selectOnBid.called) {
       setLoading(false);
-      const {message, success} = selectOnBid;
+      const {success} = selectOnBid;
       if (success) {
         setShowBidModal(false);
         setAmount('');
-        Snackbar.show({
-          text: message,
-          backgroundColor: 'green',
-          duration: Snackbar.LENGTH_SHORT,
-        });
-        dispatch(onGetVehicleDetails(route.params.data.uuid));
+        navigation.navigate('SuccessPage');
       } else {
         Snackbar.show({
           text: 'Your Bid is Lower than the last placed bid.',
@@ -721,13 +759,32 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
             flexDirection="row"
             justifyContent="space-evenly"
             alignItems="center">
-            <CustomText
-              color="#33A02C"
-              fontSize={14}
-              lineHeight={20}
-              fontFamily="Roboto-Medium">
-              Closing Price - Rs.{vehicleDetails?.vehicle.auction_value}
-            </CustomText>
+            {vehicleDetails?.vehicle.vehicle_status === 'in_auction' ? (
+              <Box style={styles.time}>
+                <MaterialCommunityIcons
+                  name="clock-outline"
+                  size={20}
+                  color="#FF0000"
+                  style={{marginRight: 5}}
+                />
+                <CustomText
+                  color="#FF0000"
+                  fontSize={16}
+                  lineHeight={24}
+                  fontFamily="Roboto-Medium">
+                  {remainingTime}
+                </CustomText>
+              </Box>
+            ) : (
+              <CustomText
+                color="#33A02C"
+                fontSize={14}
+                lineHeight={20}
+                fontFamily="Roboto-Medium">
+                Closing Price - Rs.{vehicleDetails?.vehicle.auction_value}
+              </CustomText>
+            )}
+
             <Pressable
               style={styles.placebid}
               onPress={() => onPlaceBid(route.params.data)}>
@@ -872,5 +929,10 @@ const styles = EStyleSheet.create({
     backgroundColor: '#FFFFFF',
     width: width * 0.9,
     borderRadius: 8,
+  },
+  time: {
+    padding: '0.6rem',
+    ...contentCenter,
+    flexDirection: 'row',
   },
 });
