@@ -48,12 +48,18 @@ export default function Profile({navigation}: ProfileProps) {
     }
   }
   useEffect(() => {
-    dispatch(onGetProfile());
+    navigation.addListener('focus', onFocus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function onFocus() {
+    setLoading(true);
+    dispatch(onGetProfile());
+  }
+
   useEffect(() => {
     if (selectGetProfile.called) {
+      setLoading(false);
       const {data, success} = selectGetProfile;
       if (success && data) {
         setProfleDetail(data);

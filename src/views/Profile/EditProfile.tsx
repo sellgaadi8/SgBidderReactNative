@@ -36,8 +36,6 @@ export default function EditProfile({navigation}: EditProfileProps) {
   const selectProfileUpate = useAppSelector(state => state.updateProfile);
   const selectGetProfile = useAppSelector(state => state.getProfile);
 
-  console.log('isFirstTime', isFirstTime);
-
   useEffect(() => {
     dispatch(onGetProfile());
     setPhone(userPhone);
@@ -77,7 +75,11 @@ export default function EditProfile({navigation}: EditProfileProps) {
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });
-        navigation.navigate('ExploreStack');
+        if (isFirstTime) {
+          navigation.navigate('ExploreStack');
+        } else {
+          navigation.navigate('ProfileStack');
+        }
       }
     }
     if (selectGetProfile.called) {

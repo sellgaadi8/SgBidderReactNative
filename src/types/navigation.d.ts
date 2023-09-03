@@ -14,16 +14,17 @@ type RootStackParamList = {
     highetBid?: string;
     data: Vehicle;
   };
-  EditProfile: undefined;
+  EditProfile: {title: string | null | undefined};
   ExploreStack: undefined;
   OrderChart: {vehicleData: Vehicle};
   DealLost: {data: Vehicle[]};
   ImageViewerCarousel: {
-    data: {key: string; value: string}[];
-    index: number;
+    data: {index: number; key: string; value: string}[];
+    title: string;
   };
   SuccessPage: undefined;
   OrderStack: {activeIndex: number};
+  ProfileStack: undefined;
 };
 
 type BottomStackParamList = {

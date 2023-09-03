@@ -47,11 +47,11 @@ export const onSendOtp = (phone: string) => (dispatch: AppDispatch) => {
     .catch(err => {
       console.log(err, 'err');
 
-      if (err?.request?._repsonse) {
+      if (err?.request?._response) {
         handleError(err, dispatch);
         dispatch(
           sendOtpAction({
-            ...JSON.parse(err.request._repsonse),
+            ...JSON.parse(err.request._response),
             error: true,
           }),
         );

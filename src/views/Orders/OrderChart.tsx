@@ -62,6 +62,11 @@ export default function OrderChart({route, navigation}: OrderChartProps) {
     });
   }
 
+  console.log(
+    'route.params.vehicleData.auction_value',
+    route.params.vehicleData.auction_value,
+  );
+
   return (
     <Box style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>

@@ -42,7 +42,9 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const selectVehicleDetails = useAppSelector(state => state.getVehicleDetails);
   const [vehicleDetails, setVehicleDetails] = useState<VehicleDetail | null>();
   const [vehicleImage, setVehicleImage] = useState<(string | null)[]>();
-  const [images, setImages] = useState<{key: string; value: string}[]>([]);
+  const [images, setImages] = useState<
+    {index: number; key: string; value: string}[]
+  >([]);
   const [play, setPlay] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
   const [video, setVideo] = useState('');
@@ -173,9 +175,12 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
           getExternelData();
         }
 
-        const imageArray: {key: string; value: string}[] = [];
+        const imageArray: {key: string; value: string; index: number}[] = [];
 
-        // Push image values with keys into the array
+        // Initialize an index variable
+        let index = 0;
+
+        // Push image values with keys and index into the array
         for (const key in vehicleDetails) {
           const section = vehicleDetails[key];
           if (typeof section === 'object' && section !== null) {
@@ -187,7 +192,9 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                 'image' in subSection &&
                 !subSection.image.includes('mp4')
               ) {
-                imageArray.push({key: subKey, value: subSection.image});
+                imageArray.push({key: subKey, value: subSection.image, index});
+                // Increment the index for the next element
+                index++;
               }
             }
           }
@@ -270,10 +277,10 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     console.log('ok', okValue);
   }
 
-  function onPressImage(index: number) {
+  function onPressImage(title: string) {
     navigation.navigate('ImageViewerCarousel', {
       data: images,
-      index: index,
+      title: title,
     });
   }
 
@@ -392,7 +399,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
           </CustomText>
           <Box flexDirection="row">
             <CustomText
-              fontSize={11}
+              fontSize={12}
               lineHeight={18}
               color="#111111"
               fontFamily="Roboto-Medium">
@@ -524,7 +531,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                           ? el[1].value
                           : el[1]
                       }
-                      onPressImage={() => onPressImage(index)}
+                      onPressImage={() => onPressImage(el[0])}
                     />
                   );
                 })}
@@ -559,7 +566,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                             title={el[0].replace(/_/g, ' ').toUpperCase()}
                             image={el[1] ? el[1].image : ''}
                             value={el[1] ? el[1].value : ''}
-                            onPressImage={() => onPressImage(index)}
+                            onPressImage={() => onPressImage(el[0])}
                           />
                         );
                       }
@@ -599,7 +606,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                           title={el[0].replace(/_/g, ' ').toUpperCase()}
                           image={el[1] ? el[1].image : ''}
                           value={el[1] ? el[1].value : ''}
-                          onPressImage={() => onPressImage(index)}
+                          onPressImage={() => onPressImage(el[0])}
                         />
                       );
                     }
@@ -617,7 +624,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                       title={el[0].replace(/_/g, ' ').toUpperCase()}
                       image={el[1] ? el[1].image : ''}
                       value={el[1] ? el[1].value : ''}
-                      onPressImage={() => onPressImage(index)}
+                      onPressImage={() => onPressImage(el[0])}
                     />
                   );
                 })}
@@ -643,7 +650,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                           ? el[1]
                           : ''
                       }
-                      onPressImage={() => onPressImage(index)}
+                      onPressImage={() => onPressImage(el[0])}
                       onPressVideo={() =>
                         onPressVideo(
                           typeof el[1] === 'object'
@@ -678,7 +685,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                           ? el[1].value
                           : el[1]
                       }
-                      onPressImage={() => onPressImage(index)}
+                      onPressImage={() => onPressImage(el[0])}
                     />
                   );
                 })}
@@ -697,7 +704,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                         title={el[0].replace(/_/g, ' ').toUpperCase()}
                         image={el[1] ? el[1].image : ''}
                         value={el[1] ? el[1].value : ''}
-                        onPressImage={() => onPressImage(index)}
+                        onPressImage={() => onPressImage(el[0])}
                       />
                     );
                   },

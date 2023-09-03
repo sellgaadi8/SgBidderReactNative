@@ -1,4 +1,5 @@
-import React, {useRef, useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect, useRef, useState} from 'react';
 import {Dimensions, Pressable, Text, View} from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Animated from 'react-native-reanimated';
@@ -12,7 +13,7 @@ import {ImageViewerCarouselProps} from '../../types/propTypes';
 const {width, height} = Dimensions.get('screen');
 
 export default function ImageViewerCarousel({route}: ImageViewerCarouselProps) {
-  const {data, index: startingIndex} = route.params;
+  const {data, title} = route.params;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [images, setImages] = useState<{key: string; value: string}[]>([
@@ -21,7 +22,17 @@ export default function ImageViewerCarousel({route}: ImageViewerCarouselProps) {
 
   const _caoursel = useRef<Carousel<any>>(null);
 
-  const [currentIndex, setCurrentIndex] = useState(startingIndex);
+  const [currentIndex, setCurrentIndex] = useState(data[0].index);
+
+  useEffect(() => {
+    for (let i = 0; i < data.length; i++) {
+      console.log('called');
+
+      if (data[i].key === title) {
+        setCurrentIndex(data[i].index);
+      }
+    }
+  }, []);
 
   function _renderItem(item: any) {
     return (
@@ -96,7 +107,7 @@ export default function ImageViewerCarousel({route}: ImageViewerCarouselProps) {
           sliderWidth={width}
           sliderHeight={height}
           itemHeight={height}
-          firstItem={startingIndex}
+          firstItem={currentIndex}
           itemWidth={width}
         />
       </View>
