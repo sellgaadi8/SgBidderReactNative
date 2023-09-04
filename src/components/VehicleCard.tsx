@@ -13,6 +13,7 @@ import FastImage from 'react-native-fast-image';
 import Video from 'react-native-video';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {VehicleCardProps} from '../types/propTypes';
+import Indicator from './Indicator';
 const {height, width} = Dimensions.get('window');
 
 export default function VehicleCard({
@@ -22,6 +23,7 @@ export default function VehicleCard({
   isOrder = true,
   isDealLost = false,
 }: VehicleCardProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const calculateRemainingTime = (timeDiff: number) => {
     if (timeDiff <= 0) {
       return '00:00:00';
@@ -64,9 +66,18 @@ export default function VehicleCard({
     return () => clearInterval(interval);
   }, [targetDateString]);
 
+  function handleOnScroll(event: any) {
+    var abc =
+      event.nativeEvent.contentOffset.x / Dimensions.get('window').width;
+    setCurrentIndex(Math.round(abc));
+  }
+
   return (
     <Box style={styles.container}>
-      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        onScroll={handleOnScroll}>
         {data.images ? (
           data.images.map((el, index) => {
             return (
@@ -99,6 +110,11 @@ export default function VehicleCard({
           />
         )}
       </ScrollView>
+      {/* {data.images && (
+        <Box style={styles.indicator}>
+          <Indicator index={currentIndex} length={data.images?.length - 1} />
+        </Box>
+      )} */}
       {isDealLost && (
         <Box style={styles.dealLost}>
           <CustomText
@@ -219,7 +235,7 @@ export default function VehicleCard({
           alignItems="center"
           pv={'5%'}
           justifyContent="space-between">
-          {data.vehicle_status === 'in_auction' && (
+          {isOrder && data.vehicle_status === 'in_auction' && (
             <Box style={styles.time}>
               <MaterialCommunityIcons
                 name="clock-outline"
@@ -405,5 +421,8 @@ const styles = EStyleSheet.create({
     right: 30,
     borderBottomRightRadius: 8,
     borderBottomLeftRadius: 8,
+  },
+  indicator: {
+    top: -20,
   },
 });

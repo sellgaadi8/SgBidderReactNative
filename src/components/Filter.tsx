@@ -185,7 +185,7 @@ export default function Filter({
         <Box style={styles.buttonContainer}>
           <Box width={'45%'}>
             <PrimaryButton
-              label="Discard"
+              label="Reset"
               onPress={discardFilter}
               varient="Secondary"
             />

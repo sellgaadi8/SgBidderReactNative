@@ -92,7 +92,8 @@ type AppColors =
   | '#201A1B'
   | '#1C1B1F'
   | '#49454F'
-  | '#EFC24F';
+  | '#EFC24F'
+  | '#39A1EA';
 
 type TextButtonProps = {
   label: string;

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Image,
@@ -27,6 +28,9 @@ import {onLogin} from '../../redux/ducks/login';
 import GlobalContext from '../../contexts/GlobalContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LoginProps} from '../../types/propTypes';
+import TextButton from '../../components/TextButton';
+import OTPTimer from '../../components/OTPTimer';
+// import SmsRetriever from 'react-native-sms-retriever';
 
 export default function Login({navigation}: LoginProps) {
   const [mobile, setMobile] = useState('');
@@ -37,18 +41,24 @@ export default function Login({navigation}: LoginProps) {
   const [showOtp, setShowOtp] = useState(false);
   const selectOtp = useAppSelector(state => state.sendOtp);
   const selectLogin = useAppSelector(state => state.login);
+  const [canRequestOtp, setCanRequestOtp] = useState(true);
+  const [seconds, setSeconds] = useState('30');
   const {setAuthenticated, setIsFirstTime, setUserPhone} =
     useContext(GlobalContext);
 
   const dispatch = useDispatch<any>();
+
+  function sendOtp() {
+    setLoading(true);
+    dispatch(onSendOtp(mobile));
+  }
 
   function onSubmit() {
     Keyboard.dismiss();
     const isValid = validateInputs();
     if (isValid) {
       if (!showOtp) {
-        setLoading(true);
-        dispatch(onSendOtp(mobile));
+        sendOtp();
       } else {
         setLoading(true);
         dispatch(onLogin(mobile, password, 'bidder', true, ''));
@@ -75,6 +85,7 @@ export default function Login({navigation}: LoginProps) {
       setLoading(false);
       const {success, message} = selectOtp;
       if (success) {
+        setCanRequestOtp(false);
         Snackbar.show({
           text: message,
           backgroundColor: 'green',
@@ -105,7 +116,7 @@ export default function Login({navigation}: LoginProps) {
         setAuthenticated(true);
         setIsFirstTime(true);
         setTimeout(() => {
-          navigation.navigate('EditProfile');
+          navigation.navigate('EditProfile', {title: null});
         }, 1000);
       } else if (!success) {
         Snackbar.show({
@@ -117,25 +128,40 @@ export default function Login({navigation}: LoginProps) {
     }
   }, [selectOtp, selectLogin]);
 
-  // function onLoginWithOtp() {
-  //   setShowPass(true);
-  //   setPassword('');
-  //   if (mobile.length !== 0) {
-  //     dispatch(onSendOtp(mobile));
-  //     setIsPassword(!isPassword);
-  //   } else {
-  //     Snackbar.show({
-  //       text: 'Enter mobile number first',
-  //       backgroundColor: 'red',
-  //       duration: Snackbar.LENGTH_SHORT,
-  //     });
-  //   }
-  // }
-
   function onEdit() {
     setShowOtp(false);
     setPassword('');
+    setCanRequestOtp(true);
   }
+
+  // async function onPhoneNumberPressed() {
+  //   try {
+  //     const phoneNumber = await SmsRetriever.requestPhoneNumber();
+  //     alert(`Phone Number: ${phoneNumber}`);
+  //   } catch (error) {
+  //     alert(`Phone Number Error: ${JSON.stringify(error)}`);
+  //   }
+  // }
+
+  // async function onSmsListenerPressed() {
+  //   try {
+  //     const registered = await SmsRetriever.startSmsRetriever();
+
+  //     if (registered) {
+  //       SmsRetriever.addSmsListener(_onReceiveSms);
+  //     }
+  //     alert(`SMS Listener Registered: ${registered}`);
+  //   } catch (error) {
+  //     alert(`SMS Listener Error: ${JSON.stringify(error)}`);
+  //   }
+  // }
+
+  // function _onReceiveSms(event) {
+  //   console.log('called');
+
+  //   alert(event.message);
+  //   SmsRetriever.removeSmsListener();
+  // }
 
   return (
     <Box style={styles.container}>
@@ -194,6 +220,7 @@ export default function Login({navigation}: LoginProps) {
                   error={errors?.password}
                   maxLength={6}
                   noMargin
+                  textContentType="oneTimeCode"
                 />
               )}
             </Box>
@@ -204,6 +231,47 @@ export default function Login({navigation}: LoginProps) {
               />
             </Box>
 
+            {/* <Button title="otp" onPress={onSmsListenerPressed} />
+            <Button title="phone" onPress={onPhoneNumberPressed} /> */}
+
+            {showOtp && (
+              <Box alignItems="center">
+                <Box flexDirection="row">
+                  <CustomText
+                    style={styles.resendOtpView}
+                    fontSize={14}
+                    lineHeight={19}
+                    fontFamily="Roboto-Regular"
+                    color="#111111">
+                    Didn’t Get OTP?
+                  </CustomText>
+                  {!canRequestOtp && (
+                    <CustomText
+                      style={[styles.resendOtpView, {left: 5}]}
+                      fontSize={14}
+                      lineHeight={19}
+                      fontFamily="Roboto-Regular"
+                      color="#39A1EA">
+                      {seconds} seconds
+                    </CustomText>
+                  )}
+                </Box>
+                {canRequestOtp && (
+                  <TextButton
+                    label={'Resend OTP'}
+                    containerStyles={[styles.resendOtpView, {marginTop: 12}]}
+                    labelStyles={styles.resendText}
+                    onPress={canRequestOtp ? sendOtp : undefined}
+                  />
+                )}
+              </Box>
+            )}
+            {!canRequestOtp && (
+              <OTPTimer
+                setSeconds={setSeconds}
+                setCanRequestOtp={setCanRequestOtp}
+              />
+            )}
             {/* <Box flexDirection="row" justifyContent="center" pv={'2%'}>
               <CustomText
                 color="#111111"
@@ -265,5 +333,8 @@ const styles = EStyleSheet.create({
     position: 'absolute',
     right: 20,
     top: 18,
+  },
+  resendOtpView: {
+    top: 15,
   },
 });

@@ -33,6 +33,7 @@ import {onOCB} from '../../redux/ducks/oneClickBuy';
 import Snackbar from 'react-native-snackbar';
 import BidWindow from '../../components/BidWindow';
 import {onPlaceVehicleBid} from '../../redux/ducks/placebid';
+import Indicator from '../../components/Indicator';
 // import Carousel from 'react-native-snap-carousel';
 // import ImageViewerCarousel from './ImageViewerCarousel';
 const {height, width} = Dimensions.get('window');
@@ -49,12 +50,13 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const [showVideo, setShowVideo] = useState(false);
   const [video, setVideo] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
-  // const [showImageModal, setShowImageModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const [id, setId] = useState('');
   const [showBidModal, setShowBidModal] = useState(false);
   const [amount, setAmount] = useState('');
   const selectOcb = useAppSelector(state => state.oneClickBuy);
   const selectOnBid = useAppSelector(state => state.placebid);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const tabs = [
     {title: 'Documents', onPress: () => onChangeTab(0)},
@@ -274,7 +276,6 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
       }
     }
     setOkValuesExternel(okValue);
-    console.log('ok', okValue);
   }
 
   function onPressImage(title: string) {
@@ -294,10 +295,6 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
       setShowVideo(true);
     }
   }
-
-  // function onCloseImageModal() {
-  //   setShowImageModal(false);
-  // }
 
   function onPlaceBid(el: Vehicle) {
     if (vehicleDetails?.vehicle.vehicle_status !== 'one_click_buy') {
@@ -344,15 +341,36 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     }
   }
 
+  function onClosedModalImage() {
+    setShowImageModal(false);
+  }
+
+  function handleOnScroll(event: any) {
+    var abc =
+      event.nativeEvent.contentOffset.x / Dimensions.get('window').width;
+    setCurrentIndex(Math.round(abc));
+  }
+
+  function handleOnScrollMainImage(event: any) {
+    var abc =
+      event.nativeEvent.contentOffset.x / Dimensions.get('window').width;
+    setCurrentIndex(Math.round(abc));
+  }
+
   return (
     <Box style={styles.container}>
       {loading && <Loader />}
       <ScrollView>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleOnScrollMainImage}>
           {vehicleImage &&
             vehicleImage?.map((el, index) => {
               return (
-                <Box key={index.toString()}>
+                <Pressable
+                  key={index.toString()}
+                  onPress={() => setShowImageModal(true)}>
                   {el && el?.includes('mp4') ? (
                     <Box>
                       <Video
@@ -375,19 +393,22 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                     </Box>
                   ) : (
                     el && (
-                      <Pressable>
-                        <Image
-                          source={{uri: el}}
-                          style={styles.images}
-                          resizeMode="cover"
-                        />
-                      </Pressable>
+                      <Image
+                        source={{uri: el}}
+                        style={styles.images}
+                        resizeMode="cover"
+                      />
                     )
                   )}
-                </Box>
+                </Pressable>
               );
             })}
         </ScrollView>
+        {vehicleImage && (
+          <Box style={styles.indicator}>
+            <Indicator index={currentIndex} length={vehicleImage?.length} />
+          </Box>
+        )}
         <Box pv={'5%'} ph={'6%'}>
           <CustomText
             fontSize={22}
@@ -760,6 +781,66 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
           onAddAmount={onAddAmount}
         />
       </Modal>
+      <Modal
+        isOpen={showImageModal}
+        onClosed={onClosedModalImage}
+        style={styles.imageModal}
+        backdrop={true}
+        backButtonClose={true}
+        backdropColor="rgba(0, 0 ,0, 0.5)">
+        <Box style={styles.modalContainer}>
+          <Pressable style={styles.closeButton} onPress={onClosedModalImage}>
+            <MaterialCommunityIcons name="close" size={25} color={'#FFFFFF'} />
+          </Pressable>
+
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleOnScroll}>
+            {vehicleImage &&
+              vehicleImage?.map((el, index) => {
+                return (
+                  <Pressable key={index.toString()} style={styles.imageBg}>
+                    {el && el?.includes('mp4') ? (
+                      <Box>
+                        <Video
+                          source={{uri: el}}
+                          style={styles.images}
+                          resizeMode="cover"
+                          paused={!play}
+                          repeat={true}
+                          muted
+                        />
+                        <Pressable
+                          style={styles.play}
+                          onPress={() => setPlay(!play)}>
+                          <Ionicons
+                            name={!play ? 'play' : 'pause'}
+                            color="#FFFFFF"
+                            size={30}
+                          />
+                        </Pressable>
+                      </Box>
+                    ) : (
+                      el && (
+                        <Image
+                          source={{uri: el}}
+                          style={[styles.images]}
+                          resizeMode="contain"
+                        />
+                      )
+                    )}
+                  </Pressable>
+                );
+              })}
+          </ScrollView>
+          {vehicleImage && (
+            <Box pv={'5%'}>
+              <Indicator index={currentIndex} length={vehicleImage?.length} />
+            </Box>
+          )}
+        </Box>
+      </Modal>
       {!route.params.isOrder && (
         <Box style={styles.bottom}>
           <Box
@@ -941,5 +1022,23 @@ const styles = EStyleSheet.create({
     padding: '0.6rem',
     ...contentCenter,
     flexDirection: 'row',
+  },
+  imageBg: {
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    marginTop: '1rem',
+  },
+  imageModal: {
+    backgroundColor: 'transparent',
+  },
+  closeButton: {
+    marginLeft: 'auto',
+    marginRight: 10,
+    paddingVertical: 20,
+  },
+  indicator: {
+    position: 'absolute',
+    top: 235,
+    alignSelf: 'center',
   },
 });
