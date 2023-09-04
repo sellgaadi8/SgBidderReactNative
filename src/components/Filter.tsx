@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {Dimensions, Pressable} from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -37,10 +38,11 @@ export default function Filter({
   const selectModel = useAppSelector(state => state.getModal);
   const selectMake = useAppSelector(state => state.getMake);
   const dispatch = useDispatch<any>();
+  const [isChecked, setIsChecked] = useState(false);
   const [tempFilter, setTempFilter] = useState<CarFilterType>({
     ...filter,
   });
-  const {modal, vehicleType} = tempFilter;
+  const {modal, vehicleType, isBid} = tempFilter;
 
   useEffect(() => {
     dispatch(getMakeList());
@@ -67,7 +69,7 @@ export default function Filter({
 
   function discardFilter() {
     setMake('');
-    setTempFilter({modal: '', vehicleType: ''});
+    setTempFilter({modal: '', vehicleType: '', isBid: false});
   }
 
   function onVtypeChange(value: string) {
@@ -138,6 +140,14 @@ export default function Filter({
     onApplyFilter({...tempFilter});
   }
 
+  function onSelectBid() {
+    setIsChecked(!isChecked);
+    const _tempFilter = {...tempFilter};
+    _tempFilter.isBid = isChecked;
+    setTempFilter(_tempFilter);
+    console.log('is', isChecked);
+  }
+
   return (
     <>
       <Box>
@@ -180,6 +190,24 @@ export default function Filter({
             noMargin
             editable={false}
           />
+        </Pressable>
+
+        <Pressable
+          onPress={onSelectBid}
+          style={{flexDirection: 'row', paddingHorizontal: '4%'}}>
+          <Icon
+            name={isBid ? 'checkbox-marked' : 'checkbox-blank-outline'}
+            color={isBid ? colors.secondary : '#111111'}
+            size={20}
+          />
+          <CustomText
+            fontFamily="Roboto-Medium"
+            color={'#111111'}
+            fontSize={16}
+            lineHeight={20}
+            style={{left: 5}}>
+            Show my bidded cars
+          </CustomText>
         </Pressable>
 
         <Box style={styles.buttonContainer}>
@@ -230,6 +258,7 @@ const styles = EStyleSheet.create({
     marginRight: 20,
     marginLeft: 20,
     marginBottom: 20,
+    marginTop: '2rem',
   },
   endIcon: {
     backgroundColor: colors.secondaryLight,

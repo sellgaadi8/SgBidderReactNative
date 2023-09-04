@@ -18,8 +18,9 @@ const getVehicleUrl = (
   vehicle_make: string,
   vehicle_type: string,
   page_no: number,
+  show_my_bids: boolean,
 ) =>
-  `/vehicle/list?vehicle_status=${vehicle_status}&vehicle_make=${vehicle_make}&vehicle_type=${vehicle_type}&page_no=${page_no}`;
+  `/vehicle/list?vehicle_status=${vehicle_status}&vehicle_make=${vehicle_make}&vehicle_type=${vehicle_type}&page_no=${page_no}&show_my_bids=${show_my_bids}`;
 
 const getVehicleDetailsUrl = (id: string) => `/vehicle/getVehicleDetails/${id}`;
 const getCarStatus = (id: string) => `/vehicle/getStatusHistory/${id}`;

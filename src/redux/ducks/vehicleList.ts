@@ -9,7 +9,7 @@ const VEHICLE_LIST: VEHICLE_LIST = 'sgSeller/vehicleList';
 const initialState: VehicleListState = {
   called: false,
   success: false,
-  data: [],
+  data: null,
   error: false,
 };
 
@@ -30,9 +30,15 @@ const vehicleListAction = (res: VehicleListState): VehicleListAction => {
 };
 
 export const onGetVehicleList =
-  (status: string, model: string, vehicle_type: string, page: number) =>
+  (
+    status: string,
+    model: string,
+    vehicle_type: string,
+    page: number,
+    show_my_bids: boolean,
+  ) =>
   async (dispatch: AppDispatch) => {
-    const url = getVehicleUrl(status, model, vehicle_type, page);
+    const url = getVehicleUrl(status, model, vehicle_type, page, show_my_bids);
     const token = await getUserToken();
 
     const config = {

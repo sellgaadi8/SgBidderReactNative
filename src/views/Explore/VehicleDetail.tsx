@@ -163,6 +163,10 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
       const {data, success, error} = selectVehicleDetails;
 
       if (success && !error && data) {
+        if (data.vehicle) {
+          // let amnt = Number(data.vehicle.highest_bid) + 500;
+          // setAmount(amnt.toString());
+        }
         setVehicleDetails(data);
         if (data.car_images) {
           setVehicleImage(Object.values(data.car_images));

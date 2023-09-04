@@ -28,7 +28,7 @@ type VehicleListState = {
     vehicle_list: Vehicle[];
     deals_lost_list: Vehicle[] | null;
     count: number;
-  };
+  } | null;
   error: boolean;
 };
 

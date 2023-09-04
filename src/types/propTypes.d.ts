@@ -226,6 +226,7 @@ type EditProfileProps = {
 type CarFilterType = {
   modal: string;
   vehicleType: string;
+  isBid: boolean;
 };
 
 type FilterProps = {

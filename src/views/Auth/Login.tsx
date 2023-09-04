@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  ActivityIndicator,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -30,7 +31,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LoginProps} from '../../types/propTypes';
 import TextButton from '../../components/TextButton';
 import OTPTimer from '../../components/OTPTimer';
-// import SmsRetriever from 'react-native-sms-retriever';
+import SmsRetriever from 'react-native-sms-retriever';
 
 export default function Login({navigation}: LoginProps) {
   const [mobile, setMobile] = useState('');
@@ -43,14 +44,17 @@ export default function Login({navigation}: LoginProps) {
   const selectLogin = useAppSelector(state => state.login);
   const [canRequestOtp, setCanRequestOtp] = useState(true);
   const [seconds, setSeconds] = useState('30');
+  const [isAuto, setIsAuto] = useState(false);
   const {setAuthenticated, setIsFirstTime, setUserPhone} =
     useContext(GlobalContext);
 
   const dispatch = useDispatch<any>();
 
   function sendOtp() {
+    setPassword('');
     setLoading(true);
     dispatch(onSendOtp(mobile));
+    onSmsListenerPressed();
   }
 
   function onSubmit() {
@@ -135,34 +139,35 @@ export default function Login({navigation}: LoginProps) {
     setSeconds('');
   }
 
-  // async function onPhoneNumberPressed() {
-  //   try {
-  //     const phoneNumber = await SmsRetriever.requestPhoneNumber();
-  //     alert(`Phone Number: ${phoneNumber}`);
-  //   } catch (error) {
-  //     alert(`Phone Number Error: ${JSON.stringify(error)}`);
-  //   }
-  // }
+  async function onSmsListenerPressed() {
+    try {
+      const registered = await SmsRetriever.startSmsRetriever();
 
-  // async function onSmsListenerPressed() {
-  //   try {
-  //     const registered = await SmsRetriever.startSmsRetriever();
+      if (registered) {
+        setIsAuto(true);
+        SmsRetriever.addSmsListener(_onReceiveSms);
+      }
+    } catch (error) {}
+  }
 
-  //     if (registered) {
-  //       SmsRetriever.addSmsListener(_onReceiveSms);
-  //     }
-  //     alert(`SMS Listener Registered: ${registered}`);
-  //   } catch (error) {
-  //     alert(`SMS Listener Error: ${JSON.stringify(error)}`);
-  //   }
-  // }
+  function _onReceiveSms(event: {message: string}) {
+    const regex = /\b(\d{6}\s[A-Za-z0-9]{10,})\b/;
+    const match = event.message.match(regex);
 
-  // function _onReceiveSms(event) {
-  //   console.log('called');
+    if (match) {
+      const otpWithLetters = match[1];
+      const numericOTP = otpWithLetters.split(' ')[0];
+      setPassword(numericOTP);
+      setIsAuto(false);
+    }
+    SmsRetriever.removeSmsListener();
+  }
 
-  //   alert(event.message);
-  //   SmsRetriever.removeSmsListener();
-  // }
+  function onChangeT(text: string) {
+    setIsAuto(false);
+    SmsRetriever.removeSmsListener();
+    setPassword(text);
+  }
 
   return (
     <Box style={styles.container}>
@@ -217,11 +222,25 @@ export default function Login({navigation}: LoginProps) {
                   showTextButton={true}
                   value={password}
                   keyboardType="numeric"
-                  onChangeText={setPassword}
+                  onChangeText={onChangeT}
                   error={errors?.password}
                   maxLength={6}
                   noMargin
                   textContentType="oneTimeCode"
+                  renderEndIcon={
+                    isAuto
+                      ? () => {
+                          return (
+                            <Box style={styles.eye}>
+                              <ActivityIndicator
+                                size={'small'}
+                                color={colors.secondary}
+                              />
+                            </Box>
+                          );
+                        }
+                      : undefined
+                  }
                 />
               )}
             </Box>
@@ -231,9 +250,6 @@ export default function Login({navigation}: LoginProps) {
                 onPress={onSubmit}
               />
             </Box>
-
-            {/* <Button title="otp" onPress={onSmsListenerPressed} />
-            <Button title="phone" onPress={onPhoneNumberPressed} /> */}
 
             {showOtp && (
               <Box alignItems="center">

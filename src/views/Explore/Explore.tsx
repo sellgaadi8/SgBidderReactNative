@@ -44,6 +44,7 @@ export default function Explore({navigation}: ExploreProps) {
   const [filter, setFilter] = useState<CarFilterType>({
     modal: '',
     vehicleType: '',
+    isBid: false,
   });
   const [amount, setAmount] = useState('');
   const [id, setId] = useState('');
@@ -67,6 +68,8 @@ export default function Explore({navigation}: ExploreProps) {
     };
   }, []);
 
+  console.log('filter', filter.isBid);
+
   function onFocus() {
     setLoading(true);
     getData();
@@ -77,7 +80,13 @@ export default function Explore({navigation}: ExploreProps) {
   function getData() {
     setEnableTab(false);
     dispatch(
-      onGetVehicleList(activeStatus, filter.modal, filter.vehicleType, page),
+      onGetVehicleList(
+        activeStatus,
+        filter.modal,
+        filter.vehicleType,
+        page,
+        filter.isBid,
+      ),
     );
   }
 
@@ -89,7 +98,15 @@ export default function Explore({navigation}: ExploreProps) {
     setPage(1);
     setResetPagination(true);
     setTotal(0);
-    dispatch(onGetVehicleList(status, filter.modal, filter.vehicleType, page));
+    dispatch(
+      onGetVehicleList(
+        status,
+        filter.modal,
+        filter.vehicleType,
+        page,
+        filter.isBid,
+      ),
+    );
   }
 
   useEffect(() => {
@@ -172,6 +189,7 @@ export default function Explore({navigation}: ExploreProps) {
         selectedFilters.modal,
         selectedFilters.vehicleType,
         page,
+        selectedFilters.isBid,
       ),
     );
     if (vehicleData && vehicleData.length !== 0) {
@@ -286,7 +304,13 @@ export default function Explore({navigation}: ExploreProps) {
     setRefreshing(true);
     setVehicleData([]);
     dispatch(
-      onGetVehicleList(activeStatus, filter.modal, filter.vehicleType, page),
+      onGetVehicleList(
+        activeStatus,
+        filter.modal,
+        filter.vehicleType,
+        page,
+        filter.isBid,
+      ),
     );
   }
 
@@ -296,7 +320,7 @@ export default function Explore({navigation}: ExploreProps) {
       setLoading(true);
       setPage(nextPage);
       setEnableTab(false);
-      dispatch(onGetVehicleList(activeStatus, '', '', page));
+      dispatch(onGetVehicleList(activeStatus, '', '', page, false));
     } else {
       setPage(1);
     }
@@ -343,6 +367,17 @@ export default function Explore({navigation}: ExploreProps) {
               fontSize={12}
               lineHeight={18}>
               {filter.vehicleType.replace(/_/g, ' ')}
+            </CustomText>
+          </Box>
+        )}
+        {filter.isBid && (
+          <Box style={[styles.filterBox, {left: 20}]}>
+            <CustomText
+              fontFamily="Roboto-Medium"
+              color="#FFFFFF"
+              fontSize={12}
+              lineHeight={18}>
+              Bidded Vehicle
             </CustomText>
           </Box>
         )}
