@@ -132,6 +132,7 @@ export default function Login({navigation}: LoginProps) {
     setShowOtp(false);
     setPassword('');
     setCanRequestOtp(true);
+    setSeconds('');
   }
 
   // async function onPhoneNumberPressed() {
