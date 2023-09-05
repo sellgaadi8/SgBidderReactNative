@@ -228,14 +228,14 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     }
     if (selectOnBid.called) {
       setLoading(false);
-      const {success} = selectOnBid;
+      const {success, message} = selectOnBid;
       if (success) {
         setShowBidModal(false);
         setAmount('');
         navigation.navigate('SuccessPage');
       } else {
         Snackbar.show({
-          text: 'Your Bid is Lower than the last placed bid.',
+          text: message,
           backgroundColor: 'red',
           duration: Snackbar.LENGTH_SHORT,
         });
@@ -333,12 +333,13 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     setAmount(value.toString());
   }
 
-  function onSubmitBid() {
-    if (+amount > 1000) {
+  function onSubmitBid(value: string) {
+    const result = (20 / 100) * Number(value);
+    if (+amount >= result) {
       dispatch(onPlaceVehicleBid(id, amount));
     } else {
       Snackbar.show({
-        text: 'Please enter a valid bid amount',
+        text: `Bid amount should be greater then ${result}`,
         backgroundColor: 'red',
         duration: Snackbar.LENGTH_SHORT,
       });
@@ -791,7 +792,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
         style={styles.imageModal}
         backdrop={true}
         backButtonClose={true}
-        backdropColor="rgba(0, 0 ,0, 0.5)">
+        backdropColor="#111111">
         <Box style={styles.modalContainer}>
           <Pressable style={styles.closeButton} onPress={onClosedModalImage}>
             <MaterialCommunityIcons name="close" size={25} color={'#FFFFFF'} />
@@ -829,7 +830,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                       el && (
                         <Image
                           source={{uri: el}}
-                          style={[styles.images]}
+                          style={{height: height * 0.48, width: width}}
                           resizeMode="contain"
                         />
                       )

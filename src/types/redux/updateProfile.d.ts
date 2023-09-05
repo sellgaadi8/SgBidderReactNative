@@ -4,7 +4,7 @@ type UpdateProfileState = {
   success: boolean;
   called: boolean;
   error: boolean;
-  message: string | null;
+  message: string;
 };
 
 type UpdateProfileAction = {

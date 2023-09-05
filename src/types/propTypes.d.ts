@@ -224,6 +224,7 @@ type EditProfileProps = {
 };
 
 type CarFilterType = {
+  makeValue?: string;
   modal: string;
   vehicleType: string;
   isBid: boolean;
@@ -265,8 +266,8 @@ type EditProfileProps = {
 };
 
 type BidWindowProps = {
-  data: Vehicle | undefined;
-  onPlaceBid: () => void;
+  data: Vehicle;
+  onPlaceBid: (value: string) => void;
   onPlus: () => void;
   onMinus: () => void;
   onClose: () => void;

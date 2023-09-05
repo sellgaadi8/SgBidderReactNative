@@ -10,7 +10,7 @@ const initialState: UpdateProfileState = {
   called: false,
   success: false,
   error: false,
-  message: null,
+  message: '',
 };
 
 export default (

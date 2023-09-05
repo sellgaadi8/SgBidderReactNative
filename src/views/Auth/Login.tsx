@@ -45,7 +45,7 @@ export default function Login({navigation}: LoginProps) {
   const [canRequestOtp, setCanRequestOtp] = useState(true);
   const [seconds, setSeconds] = useState('30');
   const [isAuto, setIsAuto] = useState(false);
-  const {setAuthenticated, setIsFirstTime, setUserPhone} =
+  const {setAuthenticated, setIsFirstTime, setUserPhone, setUseName} =
     useContext(GlobalContext);
 
   const dispatch = useDispatch<any>();
@@ -106,8 +106,9 @@ export default function Login({navigation}: LoginProps) {
     }
     if (selectLogin.called) {
       setLoading(false);
-      const {message, success, is_register} = selectLogin;
+      const {message, success, is_register, name} = selectLogin;
       if (success && is_register === 0) {
+        setUseName(name);
         setIsFirstTime(false);
         setAuthenticated(true);
         Snackbar.show({

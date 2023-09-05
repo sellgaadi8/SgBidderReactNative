@@ -229,6 +229,20 @@ export default function VehicleCard({
             </Box>
           </Box>
         )}
+        {data.vehicle_status === 'one_click_buy' &&
+          data.ocb_value &&
+          data.ocb_value.length !== 0 && (
+            <Box
+              style={[styles.customerexpected, {backgroundColor: '#33A02C'}]}>
+              <CustomText
+                color="#FFFFFF"
+                fontSize={14}
+                lineHeight={22}
+                fontFamily="Roboto-Medium">
+                Closing Price: {}Rs.{data.ocb_value}
+              </CustomText>
+            </Box>
+          )}
 
         <Box
           flexDirection="row"
@@ -253,19 +267,6 @@ export default function VehicleCard({
             </Box>
           )}
 
-          {data.vehicle_status === 'one_click_buy' &&
-            data.ocb_value &&
-            data.ocb_value.length !== 0 && (
-              <Box ph={'3%'}>
-                <CustomText
-                  color="#33A02C"
-                  fontSize={13}
-                  lineHeight={24}
-                  fontFamily="Roboto-Medium">
-                  Closing Price: Rs.{data.ocb_value}
-                </CustomText>
-              </Box>
-            )}
           {!isOrder && (
             <Box style={styles.totalPrice}>
               <CustomText

@@ -42,10 +42,13 @@ export default function Filter({
   const [tempFilter, setTempFilter] = useState<CarFilterType>({
     ...filter,
   });
-  const {modal, vehicleType, isBid} = tempFilter;
+  const {makeValue, modal, vehicleType, isBid} = tempFilter;
 
   useEffect(() => {
     dispatch(getMakeList());
+    if (makeValue) {
+      setMake(makeValue);
+    }
   }, []);
 
   function onPressSelecteItem(data: string, modalType: ModalType) {
@@ -56,6 +59,7 @@ export default function Filter({
         dispatch(getModelList(data));
         const _tempFilterModal = {...tempFilter};
         _tempFilterModal.modal = '';
+        _tempFilterModal.makeValue = data;
         setTempFilter(_tempFilterModal);
         break;
       case 'Model':

@@ -68,10 +68,10 @@ export default function EditProfile({navigation}: EditProfileProps) {
   useEffect(() => {
     if (selectProfileUpate.called) {
       setLoading(false);
-      const {success} = selectProfileUpate;
+      const {success, message} = selectProfileUpate;
       if (success) {
         Snackbar.show({
-          text: 'Details Added Succesfully',
+          text: message,
           backgroundColor: 'green',
           duration: Snackbar.LENGTH_SHORT,
         });

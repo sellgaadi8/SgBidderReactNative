@@ -240,7 +240,10 @@ export default function BidWindow(props: BidWindowProps & TextInputProps) {
             </Box>
 
             <Box pv={'5%'} alignItems="center">
-              <PrimaryButton label="Place bid" onPress={onPlaceBid} />
+              <PrimaryButton
+                label="Place bid"
+                onPress={() => onPlaceBid(data.auction_value)}
+              />
             </Box>
           </Box>
         </ScrollView>

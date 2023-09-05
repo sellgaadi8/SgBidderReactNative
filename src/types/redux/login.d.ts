@@ -5,7 +5,7 @@ type LoginState = {
   called: boolean;
   message: string;
   error: boolean;
-  name: string | null;
+  name: string;
   token: string | null;
   is_register: number | null;
 };

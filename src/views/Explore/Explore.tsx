@@ -8,7 +8,7 @@ import {
   Pressable,
   RefreshControl,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import Box from '../../components/Box';
 import colors from '../../utils/colors';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -29,6 +29,7 @@ import VehicleCard from '../../components/VehicleCard';
 import Loader from '../../components/Loader';
 import {onOCB} from '../../redux/ducks/oneClickBuy';
 import {contentCenter} from '../../utils/styles';
+import GlobalContext from '../../contexts/GlobalContext';
 const {width} = Dimensions.get('window');
 
 export default function Explore({navigation}: ExploreProps) {
@@ -60,6 +61,7 @@ export default function Explore({navigation}: ExploreProps) {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState<number | null>(null);
   const [enabelTab, setEnableTab] = useState(true);
+  const {userName} = useContext(GlobalContext);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
@@ -89,13 +91,14 @@ export default function Explore({navigation}: ExploreProps) {
   }
 
   function onChangeTab(index: number, status: string) {
-    setEnableTab(false);
-    setLoading(true);
-    setActiveIndex(index);
-    setActiveStatus(status);
     setPage(1);
     setResetPagination(true);
     setTotal(0);
+    setVehicleData([]);
+    // Set the active tab and status
+    setActiveIndex(index);
+    setActiveStatus(status);
+    setLoading(true);
     dispatch(
       onGetVehicleList(
         status,
@@ -153,7 +156,7 @@ export default function Explore({navigation}: ExploreProps) {
         setTotal(data.count);
       }
     }
-  }, [selectVehicleList, page, activeIndex]);
+  }, [selectVehicleList]);
 
   function onPlaceBid(el: Vehicle) {
     if (activeIndex === 0) {
@@ -225,15 +228,13 @@ export default function Explore({navigation}: ExploreProps) {
     dispatch(onGlobalChange({showBottomTabs: true}));
   }
 
-  function onSubmitBid() {
-    if (+amount > 1000) {
-      setResetPagination(true);
-      setRefreshing(true);
-      setVehicleData([]);
+  function onSubmitBid(value: string) {
+    const result = (20 / 100) * Number(value);
+    if (+amount >= result) {
       dispatch(onPlaceVehicleBid(id, amount));
     } else {
       Snackbar.show({
-        text: 'Please enter a valid bid amount',
+        text: `Bid amount should be greater then ${result}`,
         backgroundColor: 'red',
         duration: Snackbar.LENGTH_SHORT,
       });
@@ -243,14 +244,16 @@ export default function Explore({navigation}: ExploreProps) {
   useEffect(() => {
     if (selectOnBid.called) {
       setLoading(false);
-      const {success} = selectOnBid;
+      const {success, message} = selectOnBid;
       if (success) {
         setResetPagination(true);
         setShowBidModal(false);
+        setRefreshing(true);
+        setVehicleData([]);
         navigation.navigate('SuccessPage');
       } else {
         Snackbar.show({
-          text: 'Your Bid is Lower than the last placed bid.',
+          text: message,
           backgroundColor: 'red',
           duration: Snackbar.LENGTH_SHORT,
         });
@@ -313,12 +316,20 @@ export default function Explore({navigation}: ExploreProps) {
   }
 
   function onLoadMore() {
-    if (total !== null && total < vehicleData.length) {
+    if (total !== null && vehicleData.length < total) {
       const nextPage = page + 1;
       setLoading(true);
       setPage(nextPage);
       setEnableTab(false);
-      dispatch(onGetVehicleList(activeStatus, '', '', page, false));
+      dispatch(
+        onGetVehicleList(
+          activeStatus,
+          filter.modal,
+          filter.vehicleType,
+          nextPage,
+          false,
+        ),
+      );
     } else {
       setPage(1);
     }
@@ -335,7 +346,7 @@ export default function Explore({navigation}: ExploreProps) {
               fontFamily="Roboto-Medium"
               fontSize={22}
               lineHeight={28}>
-              Welcome !
+              Welcome {userName}!
             </CustomText>
           </Box>
           <Pressable style={styles.bell}>

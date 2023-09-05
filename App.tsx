@@ -26,6 +26,7 @@ export default function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [userPhone, setUserPhone] = useState('');
+  const [userName, setUseName] = useState('');
   const selectLogoutState = useAppSelector(state => state.logout);
 
   useEffect(() => {
@@ -53,6 +54,8 @@ export default function App() {
         setUserPhone,
         userPhone,
         isFirstTime,
+        userName,
+        setUseName,
       }}>
       <SafeAreaView style={styles.container}>
         <NavigationContainer>
