@@ -68,8 +68,6 @@ export default function Explore({navigation}: ExploreProps) {
     };
   }, []);
 
-  console.log('filter', filter.isBid);
-
   function onFocus() {
     setLoading(true);
     getData();
