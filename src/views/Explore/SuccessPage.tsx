@@ -6,7 +6,7 @@ import Box from '../../components/Box';
 import CustomText from '../../components/CustomText';
 import {SuccessPageProps} from '../../types/propTypes';
 
-export default function SuccessPage({navigation}: SuccessPageProps) {
+export default function SuccessPage({navigation, route}: SuccessPageProps) {
   useEffect(() => {
     setTimeout(() => {
       navigation.navigate('BottomNavigation');
@@ -22,7 +22,7 @@ export default function SuccessPage({navigation}: SuccessPageProps) {
         style={styles.image}
       />
       <CustomText color="#111111" fontSize={24} fontFamily="Roboto-Bold">
-        Bid successfully placed!
+        {route.params.msg}
       </CustomText>
     </Box>
   );

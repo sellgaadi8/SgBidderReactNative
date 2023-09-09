@@ -27,7 +27,7 @@ type RootStackParamList = {
     }[];
     index: number;
   };
-  SuccessPage: undefined;
+  SuccessPage: {msg: string};
   OrderStack: {activeIndex: number};
   ProfileStack: undefined;
   ImageSection: {
@@ -40,7 +40,9 @@ type RootStackParamList = {
     damages:
       | {[key: string]: {value: string; image: string} | string}
       | undefined;
+    selectedIndex: number;
   };
+  Notification: undefined;
 };
 
 type BottomStackParamList = {

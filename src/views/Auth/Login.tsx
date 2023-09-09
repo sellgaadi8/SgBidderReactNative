@@ -32,6 +32,7 @@ import {LoginProps} from '../../types/propTypes';
 import TextButton from '../../components/TextButton';
 import OTPTimer from '../../components/OTPTimer';
 import SmsRetriever from 'react-native-sms-retriever';
+import {isNumberValid} from '../../utils/regex';
 
 export default function Login({navigation}: LoginProps) {
   const [mobile, setMobile] = useState('');
@@ -73,10 +74,10 @@ export default function Login({navigation}: LoginProps) {
   function validateInputs() {
     const tempErrors: LoginErrors = {};
 
-    if (mobile.length < 10) {
+    if (isNumberValid(mobile) && mobile.length < 10) {
       tempErrors.mobile = 'Enter a valid number';
     }
-    if (showOtp && password.length === 0) {
+    if (showOtp && isNumberValid(password) && password.length === 0) {
       tempErrors.password = 'Enter a valid Otp';
     }
 

@@ -82,7 +82,7 @@ export default function VehicleCard({
           data.images.map((el, index) => {
             return (
               <Box key={index.toString()}>
-                {index === 0 && el !== '' ? (
+                {index === data.images.length - 1 && el !== '' ? (
                   <Video
                     source={{uri: el}}
                     style={styles.image}
@@ -276,7 +276,8 @@ export default function VehicleCard({
                 fontFamily="Roboto-Bold">
                 Total Price {'\n'}
                 Rs.
-                {data.vehicle_status === 'in_negotiation'
+                {data.vehicle_status === 'in_negotiation' ||
+                data.vehicle_status === 'auction_over'
                   ? data.my_bid_price
                   : data.accepted_price}
               </CustomText>

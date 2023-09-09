@@ -22,6 +22,7 @@ import ImageViewerCarousel from './src/views/Explore/ImageViewerCarousel';
 import SuccessPage from './src/views/Explore/SuccessPage';
 import messaging from '@react-native-firebase/messaging';
 import ImageSection from './src/views/Explore/ImageSection';
+import Notification from './src/views/Notification/Notification';
 
 export default function App() {
   const RootStack = createStackNavigator();
@@ -182,6 +183,21 @@ export default function App() {
                   }}
                   component={ImageViewerCarousel}
                   name="ImageViewerCarousel"
+                />
+                <RootStack.Screen
+                  options={() => {
+                    return {
+                      header: props => (
+                        <Header
+                          title="Notifications"
+                          headerProps={props}
+                          back
+                        />
+                      ),
+                    };
+                  }}
+                  component={Notification}
+                  name="Notification"
                 />
                 <RootStack.Screen
                   options={{headerShown: false}}

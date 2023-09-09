@@ -39,12 +39,11 @@ export default function Filter({
   const selectModel = useAppSelector(state => state.getModal);
   const selectMake = useAppSelector(state => state.getMake);
   const dispatch = useDispatch<any>();
-  const [isChecked, setIsChecked] = useState(false);
   const [tempFilter, setTempFilter] = useState<CarFilterType>({
     ...filter,
   });
   const [searchFor, setSearchFor] = useState<ModalType>('Model');
-  const {makeValue, modal, vehicleType, isBid} = tempFilter;
+  const {makeValue, modal, vehicleType, isBid = false} = tempFilter;
 
   useEffect(() => {
     dispatch(getMakeList());
@@ -85,6 +84,7 @@ export default function Filter({
   }
 
   function onOpenModal(modalType: ModalType) {
+    setSearchQuery('');
     switch (modalType) {
       case 'Make':
         setModalPlaceholder('Search Make...');
@@ -159,11 +159,9 @@ export default function Filter({
   }
 
   function onSelectBid() {
-    setIsChecked(!isChecked);
     const _tempFilter = {...tempFilter};
-    _tempFilter.isBid = isChecked;
+    _tempFilter.isBid = !isBid;
     setTempFilter(_tempFilter);
-    console.log('is', isChecked);
   }
 
   return (

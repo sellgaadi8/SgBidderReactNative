@@ -6,6 +6,7 @@ import CustomText from './CustomText';
 import {FlatList, ListRenderItemInfo, Pressable} from 'react-native';
 import Box from './Box';
 import PrimaryButton from './PrimaryButton';
+import {SearchModalProps} from '../types/propTypes';
 
 export default function SearchModal({
   placeholder,

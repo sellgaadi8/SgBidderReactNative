@@ -81,15 +81,18 @@ export default function OrderChart({route, navigation}: OrderChartProps) {
                 fontFamily="Roboto-Bold">
                 {data.mfg_year} {data.make}
               </CustomText>
-              {data.auction_value && (
-                <CustomText
-                  fontSize={16}
-                  lineHeight={24}
-                  color="#33A02C"
-                  fontFamily="Roboto-Bold">
-                  Rs.{data.auction_value}
-                </CustomText>
-              )}
+
+              <CustomText
+                fontSize={16}
+                lineHeight={24}
+                color="#33A02C"
+                fontFamily="Roboto-Bold">
+                Rs.
+                {data.vehicle_status === 'in_negotiation' ||
+                data.vehicle_status === 'auction_over'
+                  ? data.my_bid_price
+                  : data.accepted_price}
+              </CustomText>
             </Box>
           </Box>
 
@@ -164,7 +167,7 @@ const styles = StyleSheet.create({
   },
   line: {
     position: 'absolute',
-    height: '85%',
+    height: '90%',
     width: 1.5,
     backgroundColor: 'rgba(17, 17, 17, 0.5)',
     flexDirection: 'column',

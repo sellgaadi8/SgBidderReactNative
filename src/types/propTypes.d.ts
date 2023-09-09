@@ -93,7 +93,9 @@ type AppColors =
   | '#1C1B1F'
   | '#49454F'
   | '#EFC24F'
-  | '#39A1EA';
+  | '#39A1EA'
+  | '#4B4B4B'
+  | 'rgba(75, 75, 75, 0.5)';
 
 type TextButtonProps = {
   label: string;
@@ -298,4 +300,10 @@ type SuccessPageProps = {
 type ImageSectionProps = {
   navigation: StackNavigationProp<RootStackParamList, 'ImageSection'>;
   route: RouteProp<RootStackParamList, 'ImageSection'>;
+};
+
+type NotificationProps = {
+  data: NotificationItem;
+  navigation: any;
+  onRead: () => void;
 };

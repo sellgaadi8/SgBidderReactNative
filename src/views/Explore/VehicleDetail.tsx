@@ -29,6 +29,7 @@ import Snackbar from 'react-native-snackbar';
 import BidWindow from '../../components/BidWindow';
 import {onPlaceVehicleBid} from '../../redux/ducks/placebid';
 import Indicator from '../../components/Indicator';
+import {isNumberValid} from '../../utils/regex';
 const {height, width} = Dimensions.get('window');
 
 export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
@@ -48,6 +49,13 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const selectOnBid = useAppSelector(state => state.placebid);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [interiorImage, setInteriorImage] = useState('');
+  const [damagesImage, setDamagesImage] = useState<
+    | string
+    | {
+        value: string;
+        image: string;
+      }
+  >();
 
   const [tabs, setTabs] = useState([
     {
@@ -65,7 +73,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     {
       title: 'Externel panel',
       onPress: () => onChangeTab(2),
-      type: 'externel_panel',
+      type: 'external_panel',
       ratings: '',
     },
     {
@@ -211,6 +219,9 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
       const {data, success, error} = selectVehicleDetails;
 
       if (success && !error && data) {
+        let obj = Object.keys(data.damages_images_section)[0];
+        console.log('====?>', data.damages_images_section[obj]);
+        setDamagesImage(data.damages_images_section[obj]);
         const updatedTabs = [...tabs];
         const updatedTwoWheelerTab = [...twoWheelerTab];
         for (const key in data) {
@@ -255,12 +266,14 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
       setLoading(false);
       const {success, message} = selectOcb;
       if (success) {
-        Snackbar.show({
-          text: message,
-          backgroundColor: 'green',
-          duration: Snackbar.LENGTH_SHORT,
+        // Snackbar.show({
+        //   text: message,
+        //   backgroundColor: 'green',
+        //   duration: Snackbar.LENGTH_SHORT,
+        // });
+        navigation.navigate('SuccessPage', {
+          msg: 'Vehicle Bought Successfully!',
         });
-        navigation.navigate('BottomNavigation');
       } else {
         Snackbar.show({
           text: message,
@@ -275,7 +288,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
       if (success) {
         setShowBidModal(false);
         setAmount('');
-        navigation.navigate('SuccessPage');
+        navigation.navigate('SuccessPage', {msg: 'Bid successfully placed!'});
       } else {
         Snackbar.show({
           text: message,
@@ -340,6 +353,11 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     if (vehicleDetails?.vehicle.vehicle_status !== 'one_click_buy') {
       setId(el.uuid);
       setShowBidModal(true);
+      if (el.highest_bid) {
+        setAmount(el.highest_bid.replace(/,/g, ''));
+      } else {
+        setAmount('');
+      }
     } else {
       setLoading(true);
       dispatch(onOCB(el.uuid));
@@ -371,11 +389,19 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
 
   function onSubmitBid(value: string) {
     const result = (20 / 100) * Number(value);
-    if (+amount >= result) {
-      dispatch(onPlaceVehicleBid(id, amount));
+    if (isNumberValid(amount)) {
+      if (+amount >= result) {
+        dispatch(onPlaceVehicleBid(id, amount));
+      } else {
+        Snackbar.show({
+          text: `Bid amount should be greater then ${result}`,
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
     } else {
       Snackbar.show({
-        text: `Bid amount should be greater then ${result}`,
+        text: 'Enter valid bid amount',
         backgroundColor: 'red',
         duration: Snackbar.LENGTH_SHORT,
       });
@@ -430,11 +456,12 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     });
   }
 
-  function onViewImageSection() {
+  function onViewImageSection(index: number) {
     navigation.navigate('ImageSection', {
       exterior: vehicleDetails?.exterior_images_section,
       interior: vehicleDetails?.interior_images_section,
       damages: vehicleDetails?.damages_images_section,
+      selectedIndex: index,
     });
   }
 
@@ -624,7 +651,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                     style={{
                       marginTop: 10,
                     }}
-                    onPress={onViewImageSection}>
+                    onPress={() => onViewImageSection(0)}>
                     <Image
                       source={{
                         uri: vehicleDetails.interior_images_section
@@ -651,7 +678,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                       marginTop: 10,
                       marginLeft: 20,
                     }}
-                    onPress={onViewImageSection}>
+                    onPress={() => onViewImageSection(1)}>
                     <Image
                       source={{
                         uri: vehicleDetails.exterior_images_section.centre_back,
@@ -670,18 +697,17 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                   </Pressable>
                 )}
               {vehicleDetails?.damages_images_section &&
-                typeof vehicleDetails.damages_images_section.left_apron ===
-                  'object' && (
+                damagesImage &&
+                typeof damagesImage === 'object' && (
                   <Pressable
                     style={{
                       marginTop: 10,
                       marginLeft: 20,
                     }}
-                    onPress={onViewImageSection}>
+                    onPress={() => onViewImageSection(2)}>
                     <Image
                       source={{
-                        uri: vehicleDetails.damages_images_section.left_apron
-                          .image,
+                        uri: damagesImage.image,
                       }}
                       style={{height: 60, width: 60, borderRadius: 8}}
                       resizeMode="cover"
@@ -691,13 +717,8 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                       fontSize={12}
                       lineHeight={16}
                       fontFamily="Roboto-Medium"
-                      style={{left: -2}}>
-                      Damages (
-                      {
-                        Object.keys(vehicleDetails?.damages_images_section)
-                          .length
-                      }
-                      )
+                      style={{left: 5}}>
+                      Damages
                     </CustomText>
                   </Pressable>
                 )}
@@ -714,14 +735,17 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                     <RectButtonCustom
                       key={idx}
                       onPress={el.onPress}
-                      style={styles.touchable}>
+                      style={[
+                        styles.touchable,
+                        {paddingVertical: idx === 0 ? 15 : 10},
+                      ]}>
                       <CustomText
                         color={idx === activeIndex ? '#FFFFFF' : '#5D5D5D'}
                         fontFamily={
                           idx === activeIndex ? 'Roboto-Bold' : 'Roboto-Medium'
                         }
                         fontSize={15}
-                        style={{top: idx === 0 ? 15 : 0}}>
+                        style={{top: idx === 0 ? 5 : 0}}>
                         {el.title}
                       </CustomText>
                       {el.ratings !== undefined && (
@@ -780,7 +804,11 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
             {activeIndex === 1 && vehicleDetails?.exterior_img && (
               <Box>
                 <CustomText style={styles.vehicleHeading}>Exterior</CustomText>
-                <Box pv={'3%'}>
+                <Box
+                  style={{
+                    marginTop:
+                      okValues && Object.keys(okValues).length !== 0 ? 10 : -20,
+                  }}>
                   <CustomText style={styles.value}>
                     {okValues &&
                       Object.keys(okValues)
@@ -824,7 +852,14 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
                   <CustomText style={styles.vehicleHeading}>
                     Externel Panel
                   </CustomText>
-                  <Box pv={'3%'}>
+                  <Box
+                    style={{
+                      marginTop:
+                        okValuesExternel &&
+                        Object.keys(okValuesExternel).length !== 0
+                          ? 10
+                          : -20,
+                    }}>
                     <CustomText style={styles.value}>
                       {okValuesExternel &&
                         Object.keys(okValuesExternel)
@@ -1162,7 +1197,6 @@ const styles = EStyleSheet.create({
     alignSelf: 'center',
     // marginBottom: '1rem',
   },
-  tabel: {},
   headers: {
     backgroundColor: '#000000',
     paddingHorizontal: 20,

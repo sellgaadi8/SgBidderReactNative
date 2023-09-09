@@ -31,6 +31,7 @@ import Loader from '../../components/Loader';
 import {onOCB} from '../../redux/ducks/oneClickBuy';
 import {contentCenter} from '../../utils/styles';
 import GlobalContext from '../../contexts/GlobalContext';
+import {isNumberValid} from '../../utils/regex';
 const {width} = Dimensions.get('window');
 
 export default function Explore({navigation}: ExploreProps) {
@@ -110,6 +111,7 @@ export default function Explore({navigation}: ExploreProps) {
         filter.modal,
       ),
     );
+    setFilter({isBid: false, makeValue: '', modal: '', vehicleType: ''});
   }
 
   useEffect(() => {
@@ -150,6 +152,7 @@ export default function Explore({navigation}: ExploreProps) {
             extra_info: item.extra_info,
             highest_bid: item.highest_bid,
             accepted_price: item.accepted_price,
+            my_bid_price: item.my_bid_price,
           });
         });
         setVehicleData(list);
@@ -167,6 +170,11 @@ export default function Explore({navigation}: ExploreProps) {
       setShowBidModal(true);
       setVehicleDetail(el);
       dispatch(onGlobalChange({showBottomTabs: false}));
+      if (el.highest_bid) {
+        setAmount(el.highest_bid.replace(/,/g, ''));
+      } else {
+        setAmount('');
+      }
     } else {
       setLoading(true);
       setResetPagination(true);
@@ -181,6 +189,7 @@ export default function Explore({navigation}: ExploreProps) {
   }
 
   function applyFilter(selectedFilters: CarFilterType) {
+    console.log('====>', selectedFilters);
     setEnableTab(false);
     setResetPagination(true);
     setFilter(selectedFilters);
@@ -234,11 +243,19 @@ export default function Explore({navigation}: ExploreProps) {
 
   function onSubmitBid(value: string) {
     const result = (20 / 100) * Number(value);
-    if (+amount >= result) {
-      dispatch(onPlaceVehicleBid(id, amount));
+    if (isNumberValid(amount)) {
+      if (+amount >= result) {
+        dispatch(onPlaceVehicleBid(id, amount));
+      } else {
+        Snackbar.show({
+          text: `Bid amount should be greater then ${result}`,
+          backgroundColor: 'red',
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
     } else {
       Snackbar.show({
-        text: `Bid amount should be greater then ${result}`,
+        text: 'Enter valid bid amount',
         backgroundColor: 'red',
         duration: Snackbar.LENGTH_SHORT,
       });
@@ -254,7 +271,7 @@ export default function Explore({navigation}: ExploreProps) {
         setShowBidModal(false);
         setRefreshing(true);
         setVehicleData([]);
-        navigation.navigate('SuccessPage');
+        navigation.navigate('SuccessPage', {msg: 'Bid successfully placed!'});
       } else {
         Snackbar.show({
           text: message,
@@ -269,11 +286,14 @@ export default function Explore({navigation}: ExploreProps) {
       if (success) {
         setResetPagination(true);
         getData();
-        Snackbar.show({
-          text: message,
-          backgroundColor: 'green',
-          duration: Snackbar.LENGTH_SHORT,
+        navigation.navigate('SuccessPage', {
+          msg: 'Vehicle Bought Successfully!',
         });
+        // Snackbar.show({
+        //   text: message,
+        //   backgroundColor: 'green',
+        //   duration: Snackbar.LENGTH_SHORT,
+        // });
       } else {
         Snackbar.show({
           text: message,
@@ -361,19 +381,26 @@ export default function Explore({navigation}: ExploreProps) {
   }
 
   useEffect(() => {
-    setResetPagination(true);
-    setVehicleData([]);
-    setLoading(true);
-    dispatch(
-      onGetVehicleList(
-        activeStatus,
-        filter.makeValue,
-        filter.vehicleType,
-        page,
-        false,
-        filter.modal,
-      ),
-    );
+    if (
+      filter.isBid === false &&
+      filter.makeValue === '' &&
+      filter.modal === '' &&
+      filter.vehicleType === ''
+    ) {
+      setResetPagination(true);
+      setVehicleData([]);
+      setLoading(true);
+      dispatch(
+        onGetVehicleList(
+          activeStatus,
+          filter.makeValue,
+          filter.vehicleType,
+          page,
+          false,
+          filter.modal,
+        ),
+      );
+    }
   }, [filter]);
 
   return (
@@ -387,10 +414,12 @@ export default function Explore({navigation}: ExploreProps) {
               fontFamily="Roboto-Medium"
               fontSize={22}
               lineHeight={28}>
-              Welcome {userName}!
+              Welcome {userName && userName.split(' ')[0]}!
             </CustomText>
           </Box>
-          <Pressable style={styles.bell}>
+          <Pressable
+            style={styles.bell}
+            onPress={() => navigation.navigate('Notification')}>
             <Icon name="bell-outline" size={25} color="#FFFFFF" />
           </Pressable>
         </Box>

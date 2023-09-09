@@ -38,3 +38,8 @@ export function isCityValid(value: string) {
   const re = /^[a-z]*$/;
   return re.test(value.trim());
 }
+
+export function isNumberValid(value: string) {
+  const re = /^([1-9][0-9]*)$/;
+  return re.test(value.trim());
+}

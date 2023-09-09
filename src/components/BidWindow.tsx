@@ -40,7 +40,7 @@ export default function BidWindow(props: BidWindowProps & TextInputProps) {
               data.images.map((el, index) => {
                 return (
                   <Box key={index.toString()}>
-                    {index === 0 && el !== '' ? (
+                    {index === data.images.length - 1 && el !== '' ? (
                       <Video
                         source={{uri: el}}
                         style={styles.image}
