@@ -19,12 +19,28 @@ type RootStackParamList = {
   OrderChart: {vehicleData: Vehicle};
   DealLost: {data: Vehicle[]};
   ImageViewerCarousel: {
-    data: {index: number; key: string; value: string}[];
-    title: string;
+    data: {
+      value: string;
+      image: string;
+      key: string;
+      index: number;
+    }[];
+    index: number;
   };
   SuccessPage: undefined;
   OrderStack: {activeIndex: number};
   ProfileStack: undefined;
+  ImageSection: {
+    exterior:
+      | {[key: string]: {value: string; image: string} | string}
+      | undefined;
+    interior:
+      | {[key: string]: {value: string; image: string} | string}
+      | undefined;
+    damages:
+      | {[key: string]: {value: string; image: string} | string}
+      | undefined;
+  };
 };
 
 type BottomStackParamList = {

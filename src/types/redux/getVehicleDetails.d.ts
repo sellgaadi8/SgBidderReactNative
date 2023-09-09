@@ -38,7 +38,7 @@ type VehicleDetail = {
     [key: string]: {value: string; image: string};
   };
   engine: {
-    [key: string]: {value: string; image: string} | string | null;
+    [key: string]: {value: string; image: string} | string;
   };
   handling_and_suspension: {[key: string]: {value: string; image: string}};
   electricals: {
@@ -52,6 +52,19 @@ type VehicleDetail = {
     auction_value: string;
     highest_bid: string;
     vehicle_status: string;
+    my_bid_value: string;
+    ocb_value: string;
+    vehicle_type: string;
+  };
+  exterior_images_section: {
+    [key: string]: {value: string; image: string} | string;
+  };
+
+  interior_images_section: {
+    [key: string]: {value: string; image: string} | string;
+  };
+  damages_images_section: {
+    [key: string]: {value: string; image: string} | string;
   };
 };
 

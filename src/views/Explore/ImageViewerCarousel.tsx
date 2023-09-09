@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useRef, useState} from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useRef, useState} from 'react';
 import {Dimensions, Pressable, Text, View} from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Animated from 'react-native-reanimated';
@@ -9,62 +9,61 @@ import colors from '../../utils/colors';
 import {container, contentCenter} from '../../utils/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ImageViewerCarouselProps} from '../../types/propTypes';
+import {PinchBox} from '../../components/PinchBox';
 
 const {width, height} = Dimensions.get('screen');
 
 export default function ImageViewerCarousel({route}: ImageViewerCarouselProps) {
-  const {data, title} = route.params;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [images, setImages] = useState<{key: string; value: string}[]>([
-    ...data,
-  ]);
+  const {data, index: startingIndex} = route.params;
 
   const _caoursel = useRef<Carousel<any>>(null);
 
-  const [currentIndex, setCurrentIndex] = useState(data[0].index);
+  const [currentIndex, setCurrentIndex] = useState(startingIndex);
 
-  useEffect(() => {
-    for (let i = 0; i < data.length; i++) {
-      console.log('called');
-
-      if (data[i].key === title) {
-        setCurrentIndex(data[i].index);
-      }
-    }
-  }, []);
-
-  function _renderItem(item: any) {
+  function _renderItem(item: {value: string; image: string; key: string}) {
     return (
       <View style={styles.itemContainer}>
-        {item.image !== null && (
+        <PinchBox>
           <Animated.Image
             resizeMode="contain"
-            source={{uri: item.value}}
+            source={{uri: item.image}}
             style={styles.item}
           />
-        )}
-        <View
-          style={[
-            styles.indicatorContainer,
-            images.length <= 1 && styles.equalPadding,
-          ]}>
-          <View style={[styles.row, images.length <= 1 && styles.center]}>
-            {images.length > 1 && (
+        </PinchBox>
+        <View style={[styles.indicatorContainer]}>
+          <View style={[styles.row, data.length <= 1 && styles.center]}>
+            {item.image.length > 1 && (
               <Pressable onPress={onPrev}>
                 <Icon size={20} name="menu-left" />
               </Pressable>
             )}
             <Text style={styles.indicator}>
-              {currentIndex + 1} / {images.length}
+              {currentIndex + 1} / {data.length}
             </Text>
-            {images.length > 1 && (
+            {item.image.length > 1 && (
               <Pressable onPress={onNext}>
                 <Icon onPress={onNext} size={20} name="menu-right" />
               </Pressable>
             )}
           </View>
-          <Text style={styles.text}>{item.key.replace(/_/g, ' ')}</Text>
+          <Text
+            style={{
+              color: colors.White,
+              fontFamily: 'Roboto-Medium',
+              fontSize: 15,
+              textTransform: 'capitalize',
+            }}>
+            {item.value.replace(/_/g, ' ')}
+          </Text>
+          <Text
+            style={{
+              color: colors.White,
+              fontFamily: 'Roboto-Regular',
+              fontSize: 14,
+              textTransform: 'capitalize',
+            }}>
+            {item.key.replace(/_/g, ' ')}
+          </Text>
         </View>
       </View>
     );
@@ -102,13 +101,18 @@ export default function ImageViewerCarousel({route}: ImageViewerCarouselProps) {
           onSnapToItem={onSnapToItem}
           enableSnap={true}
           slideStyle={styles.container}
-          data={images}
+          data={data}
           renderItem={({item}) => _renderItem(item)}
           sliderWidth={width}
           sliderHeight={height}
           itemHeight={height}
-          firstItem={currentIndex}
+          firstItem={startingIndex}
           itemWidth={width}
+          getItemLayout={(data, index) => ({
+            offset: width * index,
+            length: width,
+            index,
+          })}
         />
       </View>
     </View>
@@ -118,12 +122,13 @@ export default function ImageViewerCarousel({route}: ImageViewerCarouselProps) {
 const styles = EStyleSheet.create({
   container: {...container},
   indicatorContainer: {
-    paddingHorizontal: '1rem',
+    paddingHorizontal: '2rem',
     paddingTop: '1rem',
     marginTop: 'auto',
-    backgroundColor: colors.White,
+    backgroundColor: colors.primary,
     paddingBottom: '2rem',
-    ...contentCenter,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   row: {
     flexDirection: 'row',
@@ -133,12 +138,12 @@ const styles = EStyleSheet.create({
   item: {height: '100%', width: '100%'},
   center: {...contentCenter},
   equalPadding: {paddingBottom: '1rem'},
-  indicator: {alignSelf: 'center'},
+  indicator: {alignSelf: 'center', color: colors.White},
   text: {
-    color: colors.primary,
+    color: colors.White,
     fontFamily: 'Roboto-Medium',
     fontSize: 16,
-    textTransform: 'uppercase',
+    textTransform: '',
   },
   length: {
     color: colors.primary,

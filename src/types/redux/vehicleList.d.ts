@@ -19,6 +19,8 @@ type Vehicle = {
   auction_ends_at: string;
   extra_info: Object;
   highest_bid: string;
+  accepted_price: string;
+  my_bid_price: string;
 };
 
 type VehicleListState = {

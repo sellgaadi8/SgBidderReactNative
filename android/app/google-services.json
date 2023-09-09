@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "36583651735",
+    "project_id": "sellgaadibidder",
+    "storage_bucket": "sellgaadibidder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36583651735:android:c907c374df813d2ff8ecd2",
+        "android_client_info": {
+          "package_name": "com.sgbidderreactnative"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN3fyCww_CZeqjXiTunu9wQ5PX74S_ow0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -275,7 +275,10 @@ export default function VehicleCard({
                 color="#33A02C"
                 fontFamily="Roboto-Bold">
                 Total Price {'\n'}
-                Rs.{data.ocb_value ? data.ocb_value : data.auction_value}
+                Rs.
+                {data.vehicle_status === 'in_negotiation'
+                  ? data.my_bid_price
+                  : data.accepted_price}
               </CustomText>
             </Box>
           )}
@@ -290,7 +293,15 @@ export default function VehicleCard({
               </CustomText>
             </Pressable>
             {!isDealLost && isOrder && (
-              <Pressable style={styles.placebid} onPress={onPlaceBid}>
+              <Pressable
+                style={styles.placebid}
+                onPress={onPlaceBid}
+                disabled={
+                  data.vehicle_status !== 'one_click_buy' &&
+                  remainingTime === '00:00:00'
+                    ? true
+                    : false
+                }>
                 <CustomText
                   fontSize={10}
                   lineHeight={16}
@@ -396,7 +407,6 @@ const styles = EStyleSheet.create({
     backgroundColor: '#34A02C',
     padding: '0.2rem',
     paddingLeft: '1.5rem',
-    width: '75%',
   },
   customerexpected: {
     marginTop: '1.5rem',

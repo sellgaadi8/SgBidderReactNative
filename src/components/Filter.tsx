@@ -25,6 +25,7 @@ export default function Filter({
   onClosedFilter,
   onApplyFilter,
   filter,
+  isOcb,
 }: FilterProps) {
   const [make, setMake] = useState('');
   const [makeData, setMakeData] = useState<string[]>([]);
@@ -42,6 +43,7 @@ export default function Filter({
   const [tempFilter, setTempFilter] = useState<CarFilterType>({
     ...filter,
   });
+  const [searchFor, setSearchFor] = useState<ModalType>('Model');
   const {makeValue, modal, vehicleType, isBid} = tempFilter;
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function Filter({
 
   function discardFilter() {
     setMake('');
-    setTempFilter({modal: '', vehicleType: '', isBid: false});
+    setTempFilter({modal: '', vehicleType: '', isBid: false, makeValue: ''});
   }
 
   function onVtypeChange(value: string) {
@@ -96,6 +98,7 @@ export default function Filter({
         break;
     }
     setShowModal(true);
+    setSearchFor(modalType);
   }
 
   function onCloseMakeModal() {
@@ -103,17 +106,28 @@ export default function Filter({
   }
 
   function onChangeQuery(value: string) {
-    const lowerCaseQuery = value.toLowerCase();
+    let tempModalData = [...modalData];
+    if (value !== '') {
+      const lowerCaseQuery = value.toLowerCase();
+      tempModalData = modalData.filter(el => {
+        if (el?.toLowerCase().includes(lowerCaseQuery)) {
+          return el;
+        }
+      });
 
-    let filteredModalData = modalData.filter(el => {
-      const lowerCaseEl = el.toLowerCase();
-      return lowerCaseEl.includes(lowerCaseQuery);
-    });
-
-    if (lowerCaseQuery === '') {
-      filteredModalData = modelData;
+      setModalData([...tempModalData]);
+    } else {
+      // If search query is empty then show all data
+      switch (searchFor) {
+        case 'Model':
+          setModalData(modelData || []);
+          break;
+        case 'Make':
+          setModalData(makeData || []);
+          break;
+      }
     }
-    setModalData(filteredModalData);
+
     setSearchQuery(value);
   }
 
@@ -196,24 +210,25 @@ export default function Filter({
           />
         </Pressable>
 
-        <Pressable
-          onPress={onSelectBid}
-          style={{flexDirection: 'row', paddingHorizontal: '4%'}}>
-          <Icon
-            name={isBid ? 'checkbox-marked' : 'checkbox-blank-outline'}
-            color={isBid ? colors.secondary : '#111111'}
-            size={20}
-          />
-          <CustomText
-            fontFamily="Roboto-Medium"
-            color={'#111111'}
-            fontSize={16}
-            lineHeight={20}
-            style={{left: 5}}>
-            Show my bidded cars
-          </CustomText>
-        </Pressable>
-
+        {!isOcb && (
+          <Pressable
+            onPress={onSelectBid}
+            style={{flexDirection: 'row', paddingHorizontal: '4%'}}>
+            <Icon
+              name={isBid ? 'checkbox-marked' : 'checkbox-blank-outline'}
+              color={isBid ? colors.secondary : '#111111'}
+              size={20}
+            />
+            <CustomText
+              fontFamily="Roboto-Medium"
+              color={'#111111'}
+              fontSize={16}
+              lineHeight={20}
+              style={{left: 5}}>
+              Show my bidded cars
+            </CustomText>
+          </Pressable>
+        )}
         <Box style={styles.buttonContainer}>
           <Box width={'45%'}>
             <PrimaryButton

@@ -7,6 +7,7 @@ import {
   ListRenderItemInfo,
   Pressable,
   RefreshControl,
+  ScrollView,
 } from 'react-native';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import Box from '../../components/Box';
@@ -43,6 +44,7 @@ export default function Explore({navigation}: ExploreProps) {
   const [vehicleData, setVehicleData] = useState<Vehicle[]>([]);
   const [showFilter, setShowFilter] = useState(false);
   const [filter, setFilter] = useState<CarFilterType>({
+    makeValue: '',
     modal: '',
     vehicleType: '',
     isBid: false,
@@ -71,21 +73,20 @@ export default function Explore({navigation}: ExploreProps) {
   }, []);
 
   function onFocus() {
-    setLoading(true);
-    getData();
     setResetPagination(true);
-    setVehicleData([]);
+    onChangeTab(activeIndex, activeStatus);
   }
 
   function getData() {
-    setEnableTab(false);
+    setLoading(true);
     dispatch(
       onGetVehicleList(
         activeStatus,
-        filter.modal,
+        filter.makeValue,
         filter.vehicleType,
         page,
         filter.isBid,
+        filter.modal,
       ),
     );
   }
@@ -102,10 +103,11 @@ export default function Explore({navigation}: ExploreProps) {
     dispatch(
       onGetVehicleList(
         status,
-        filter.modal,
+        filter.makeValue,
         filter.vehicleType,
         page,
         filter.isBid,
+        filter.modal,
       ),
     );
   }
@@ -147,6 +149,7 @@ export default function Explore({navigation}: ExploreProps) {
             auction_ends_at: item.auction_ends_at,
             extra_info: item.extra_info,
             highest_bid: item.highest_bid,
+            accepted_price: item.accepted_price,
           });
         });
         setVehicleData(list);
@@ -186,11 +189,12 @@ export default function Explore({navigation}: ExploreProps) {
     setShowFilter(false);
     dispatch(
       onGetVehicleList(
-        'in_auction',
-        selectedFilters.modal,
+        activeStatus,
+        selectedFilters.makeValue,
         selectedFilters.vehicleType,
         page,
         selectedFilters.isBid,
+        selectedFilters.modal,
       ),
     );
     if (vehicleData && vehicleData.length !== 0) {
@@ -307,10 +311,11 @@ export default function Explore({navigation}: ExploreProps) {
     dispatch(
       onGetVehicleList(
         activeStatus,
-        filter.modal,
+        filter.makeValue,
         filter.vehicleType,
         page,
         filter.isBid,
+        filter.modal,
       ),
     );
   }
@@ -324,16 +329,52 @@ export default function Explore({navigation}: ExploreProps) {
       dispatch(
         onGetVehicleList(
           activeStatus,
-          filter.modal,
+          filter.makeValue,
           filter.vehicleType,
           nextPage,
           false,
+          filter.modal,
         ),
       );
     } else {
       setPage(1);
     }
   }
+
+  function onRemoveFilter(type: string) {
+    setFilter(prevFilter => {
+      // Create a copy of the previous filter
+      const updatedFilter = {...prevFilter};
+
+      // Check if the type exists in the filter object
+      if (type in updatedFilter) {
+        // Set the value of the specified property to empty
+        if (type === 'isBid') {
+          updatedFilter[type] = false;
+        } else {
+          updatedFilter[type] = '';
+        }
+      }
+      // Return the updated filter
+      return updatedFilter;
+    });
+  }
+
+  useEffect(() => {
+    setResetPagination(true);
+    setVehicleData([]);
+    setLoading(true);
+    dispatch(
+      onGetVehicleList(
+        activeStatus,
+        filter.makeValue,
+        filter.vehicleType,
+        page,
+        false,
+        filter.modal,
+      ),
+    );
+  }, [filter]);
 
   return (
     <Box style={styles.container}>
@@ -356,40 +397,7 @@ export default function Explore({navigation}: ExploreProps) {
         <TopTabs tabs={tabs} activeIndex={activeIndex} tabEnabled={enabelTab} />
       </Box>
 
-      <Box flexDirection="row" ph={'6%'}>
-        {filter.modal && (
-          <Box style={styles.filterBox}>
-            <CustomText
-              fontFamily="Roboto-Medium"
-              color="#FFFFFF"
-              fontSize={12}
-              lineHeight={18}>
-              {filter.modal}
-            </CustomText>
-          </Box>
-        )}
-        {filter.vehicleType && (
-          <Box style={[styles.filterBox, {left: 20}]}>
-            <CustomText
-              fontFamily="Roboto-Medium"
-              color="#FFFFFF"
-              fontSize={12}
-              lineHeight={18}>
-              {filter.vehicleType.replace(/_/g, ' ')}
-            </CustomText>
-          </Box>
-        )}
-        {filter.isBid && (
-          <Box style={[styles.filterBox, {left: 20}]}>
-            <CustomText
-              fontFamily="Roboto-Medium"
-              color="#FFFFFF"
-              fontSize={12}
-              lineHeight={18}>
-              Bidded Vehicle
-            </CustomText>
-          </Box>
-        )}
+      <Box>
         <Pressable
           style={styles.filter}
           onPress={() => setShowFilter(!showFilter)}>
@@ -407,11 +415,45 @@ export default function Explore({navigation}: ExploreProps) {
             style={{marginLeft: 5}}
           />
         </Pressable>
+        <Box style={[styles.selectedFilter]}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {Object.entries(filter).map((el, _index) => {
+              return (
+                el[1] && (
+                  <Box style={styles.filterBox} key={_index.toString()}>
+                    <Pressable onPress={() => onRemoveFilter(el[0])}>
+                      <Icon
+                        name="close"
+                        size={12}
+                        color={'#FFFFFF'}
+                        style={{right: 5, top: 1}}
+                      />
+                    </Pressable>
+
+                    <CustomText
+                      fontFamily="Roboto-Medium"
+                      color="#FFFFFF"
+                      fontSize={12}
+                      lineHeight={18}>
+                      {el[1] === true
+                        ? 'Bidded Value'
+                        : el[1].replace('_', ' ')}
+                    </CustomText>
+                  </Box>
+                )
+              );
+            })}
+          </ScrollView>
+        </Box>
       </Box>
 
       {vehicleData?.length !== 0 ? (
         <>
-          <Box style={styles.flat}>
+          <Box
+            style={[
+              styles.flat,
+              {marginTop: Object.values(filter).length !== 0 ? 0 : 10},
+            ]}>
             <FlatList
               data={vehicleData}
               renderItem={renderItem}
@@ -449,6 +491,7 @@ export default function Explore({navigation}: ExploreProps) {
             filter={{...filter}}
             onApplyFilter={applyFilter}
             onClosedFilter={onClosedFilter}
+            isOcb={activeIndex === 1 ? true : false}
           />
         </Modal>
       )}
@@ -456,7 +499,9 @@ export default function Explore({navigation}: ExploreProps) {
         isOpen={showBidModal}
         onClosed={onCloseBidModal}
         style={styles.modal}
-        position="center">
+        position="center"
+        backButtonClose={true}
+        backdrop={true}>
         <BidWindow
           data={vehicleDetail}
           onClose={onCloseBidModal}
@@ -503,16 +548,14 @@ const styles = EStyleSheet.create({
     borderRadius: 8,
   },
   filter: {
-    marginLeft: 'auto',
-    marginRight: 25,
-    marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 'auto',
+    marginTop: '1rem',
+    marginRight: '2rem',
   },
-  bid: {
-    padding: '2rem',
-  },
+
   flat: {
     marginBottom: '20rem',
   },
@@ -531,5 +574,12 @@ const styles = EStyleSheet.create({
     ...contentCenter,
     marginTop: 10,
     paddingHorizontal: '1.5rem',
+    marginRight: '1rem',
+    flexDirection: 'row',
+  },
+  selectedFilter: {
+    flexDirection: 'row',
+    paddingHorizontal: '8%',
+    width: '100%',
   },
 });

@@ -20,6 +20,8 @@ import OrderChart from './src/views/Orders/OrderChart';
 import DealLost from './src/views/Orders/DealLost';
 import ImageViewerCarousel from './src/views/Explore/ImageViewerCarousel';
 import SuccessPage from './src/views/Explore/SuccessPage';
+import messaging from '@react-native-firebase/messaging';
+import ImageSection from './src/views/Explore/ImageSection';
 
 export default function App() {
   const RootStack = createStackNavigator();
@@ -28,6 +30,21 @@ export default function App() {
   const [userPhone, setUserPhone] = useState('');
   const [userName, setUseName] = useState('');
   const selectLogoutState = useAppSelector(state => state.logout);
+
+  const getFirebaseToken = async () => {
+    const token = await messaging().getToken();
+    console.log('token=>>>>>', token);
+  };
+
+  useEffect(() => {
+    getFirebaseToken();
+  }, []);
+
+  useEffect(() => {
+    messaging().setBackgroundMessageHandler(async remoteMessage => {
+      console.log('Message handled in the background!', remoteMessage);
+    });
+  }, []);
 
   useEffect(() => {
     if (selectLogoutState.called) {
@@ -149,6 +166,11 @@ export default function App() {
                   }}
                   component={DealLost}
                   name="DealLost"
+                />
+                <RootStack.Screen
+                  options={{headerShown: false}}
+                  component={ImageSection}
+                  name="ImageSection"
                 />
                 <RootStack.Screen
                   options={() => {

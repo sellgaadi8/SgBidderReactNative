@@ -4,6 +4,7 @@ import Box from './Box';
 import CustomText from './CustomText';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import Video from 'react-native-video';
+import {TyresImagesProps} from '../types/propTypes';
 
 export default function PopulateImageWithData({
   title,
@@ -13,14 +14,18 @@ export default function PopulateImageWithData({
   onPressVideo,
 }: TyresImagesProps) {
   return (
-    <Box style={value && styles.title}>
-      {value && (
-        <>
+    <>
+      {title !== 'overall_rating' && value && (
+        <Box style={value && styles.title}>
           <Box style={!image && styles.row}>
-            <CustomText style={styles.dataValue}>{title}</CustomText>
-            <CustomText style={styles.value}>{value}</CustomText>
+            <CustomText style={styles.dataValue}>
+              {title.replace(/_/g, ' ').toUpperCase()}
+            </CustomText>
+            <CustomText style={styles.value}>
+              {value.replace(/_/g, ' ').toUpperCase()}
+            </CustomText>
           </Box>
-          {value !== 'MAJOR SOUND' ? (
+          {value !== 'major_sound' ? (
             <Pressable onPress={onPressImage}>
               {image && <Image source={{uri: image}} style={styles.image} />}
             </Pressable>
@@ -40,20 +45,9 @@ export default function PopulateImageWithData({
               )}
             </Pressable>
           )}
-          {/* {video && (
-            <Pressable onPress={onPressImage} style={{borderWidth: 1}}>
-              <Video
-                source={{uri: video}}
-                style={styles.images}
-                resizeMode="cover"
-                paused={false}
-                repeat={true}
-              />
-            </Pressable>
-          )} */}
-        </>
+        </Box>
       )}
-    </Box>
+    </>
   );
 }
 
@@ -63,18 +57,20 @@ const styles = EStyleSheet.create({
     justifyContent: 'space-between',
     width: '90%',
     paddingVertical: '3%',
+    alignItems: 'center',
   },
   dataValue: {
     color: '#111111',
-    fontFamily: 'Roboto-Medium',
-    lineHeight: 22,
-    fontSize: 15,
-  },
-  value: {
-    fontFamily: 'Roboto-Bold',
-    color: '#34A02C',
+    fontFamily: 'Roboto-Regular',
     lineHeight: 22,
     fontSize: 14,
+    // textTransform: 'capitalize',
+  },
+  value: {
+    fontFamily: 'Roboto-Medium',
+    color: '#34A02C',
+    lineHeight: 22,
+    fontSize: 13,
     textTransform: 'uppercase',
   },
   image: {height: 50, width: 50},

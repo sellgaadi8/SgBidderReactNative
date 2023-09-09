@@ -224,7 +224,7 @@ type EditProfileProps = {
 };
 
 type CarFilterType = {
-  makeValue?: string;
+  makeValue: string;
   modal: string;
   vehicleType: string;
   isBid: boolean;
@@ -234,6 +234,7 @@ type FilterProps = {
   onClosedFilter: () => void;
   onApplyFilter: (filters: CarFilterType) => void;
   filter: CarFilterType;
+  isOcb: boolean;
 };
 
 type VideoPlayerProps = {
@@ -292,4 +293,9 @@ type ImageViewerCarouselProps = {
 type SuccessPageProps = {
   navigation: StackNavigationProp<RootStackParamList, 'SuccessPage'>;
   route: RouteProp<RootStackParamList, 'SuccessPage'>;
+};
+
+type ImageSectionProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'ImageSection'>;
+  route: RouteProp<RootStackParamList, 'ImageSection'>;
 };

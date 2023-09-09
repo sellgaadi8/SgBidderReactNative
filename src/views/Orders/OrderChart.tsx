@@ -18,8 +18,10 @@ export default function OrderChart({route, navigation}: OrderChartProps) {
   const selectStatus = useAppSelector(state => state.getStatus);
   const [status, setStatus] = useState<Status[]>([]);
 
+  const data = route.params.vehicleData;
+
   useEffect(() => {
-    dispatch(getCarStatusDetail(route.params.vehicleData.uuid));
+    dispatch(getCarStatusDetail(data.uuid));
   }, []);
 
   function getStatus(key: string) {
@@ -53,45 +55,39 @@ export default function OrderChart({route, navigation}: OrderChartProps) {
   }, [selectStatus]);
 
   function onViewDetails() {
-    const item = route.params.vehicleData;
     navigation.navigate('VehicleDetail', {
-      title: item.model,
-      vehicleId: item.uuid,
-      auctionValue: item.auction_value ? item.auction_value : item.ocb_value,
+      title: data.model,
+      vehicleId: data.uuid,
+      auctionValue: data.auction_value ? data.auction_value : data.ocb_value,
       isOrder: true,
     });
   }
-
-  console.log(
-    'route.params.vehicleData.auction_value',
-    route.params.vehicleData.auction_value,
-  );
-
   return (
     <Box style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Box style={styles.header}>
           <Box style={styles.imageCon}>
-            <Image
-              source={{uri: route.params.vehicleData.images[1]}}
-              style={{height: 55, width: 55, borderRadius: 5}}
-            />
+            {data.images.length !== 0 && (
+              <Image
+                source={{uri: data.images[1]}}
+                style={{height: 55, width: 55, borderRadius: 5}}
+              />
+            )}
             <Box ph={'5%'}>
               <CustomText
                 fontSize={16}
                 lineHeight={24}
                 color="#1C1B1F"
                 fontFamily="Roboto-Bold">
-                {route.params.vehicleData.mfg_year}{' '}
-                {route.params.vehicleData.make}
+                {data.mfg_year} {data.make}
               </CustomText>
-              {route.params.vehicleData.auction_value && (
+              {data.auction_value && (
                 <CustomText
                   fontSize={16}
                   lineHeight={24}
                   color="#33A02C"
                   fontFamily="Roboto-Bold">
-                  Rs.{route.params.vehicleData.auction_value}
+                  Rs.{data.auction_value}
                 </CustomText>
               )}
             </Box>

@@ -36,9 +36,17 @@ export const onGetVehicleList =
     vehicle_type: string,
     page: number,
     show_my_bids: boolean,
+    vehicle_model: string,
   ) =>
   async (dispatch: AppDispatch) => {
-    const url = getVehicleUrl(status, model, vehicle_type, page, show_my_bids);
+    const url = getVehicleUrl(
+      status,
+      model,
+      vehicle_type,
+      page,
+      show_my_bids,
+      vehicle_model,
+    );
     const token = await getUserToken();
 
     const config = {

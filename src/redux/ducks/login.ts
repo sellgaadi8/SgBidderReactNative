@@ -3,6 +3,7 @@ import axiosInstance from '../../axios';
 import {LOGIN_SUBMIT} from '../../utils/api';
 import {handleError, postAuth} from '../../utils/helper';
 import {AppDispatch} from '../store';
+import messaging from '@react-native-firebase/messaging';
 
 const LOGIN: LOGIN = 'sgSeller/login';
 
@@ -11,7 +12,7 @@ const initialState: LoginState = {
   message: '',
   error: false,
   called: false,
-  name: null,
+  name: '',
   token: null,
   is_register: null,
 };
@@ -40,12 +41,16 @@ export const onLogin =
   (dispatch: AppDispatch) => {
     const url = LOGIN_SUBMIT;
 
+    const token = messaging().getToken();
+    console.log('token=>>>>>', token);
+
     const body = JSON.stringify({
       phone: phone,
       otp: otp,
       role: role,
       isOtp: isOtp,
       password: password,
+      device_token: token,
     });
 
     const config = {

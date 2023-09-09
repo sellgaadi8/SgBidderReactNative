@@ -57,23 +57,24 @@ export default function Orders({navigation}: OrdersProps) {
   const [activeStatus, setActiveStatus] = useState('in_negotiation');
 
   useEffect(() => {
-    navigation.addListener('focus', onFocus);
-    return () => {
-      navigation.removeListener('focus', onFocus);
-    };
+    // navigation.addListener('focus', onFocus);
+    // return () => {
+    //   navigation.removeListener('focus', onFocus);
+    // };
+    onFocus();
   }, []);
 
   function onFocus() {
     setLoading(true);
-    dispatch(onGetVehicleList('in_negotiation', '', '', 1, false));
-    dispatch(onGetVehicleList('deal_lost', '', '', 1, false));
+    dispatch(onGetVehicleList(activeStatus, '', '', 1, false, ''));
+    dispatch(onGetVehicleList('deal_lost', '', '', 1, false, ''));
   }
 
   function onChangeTab(index: number, status: string) {
     setActiveIndex(index);
     setActiveStatus(status);
     setLoading(true);
-    dispatch(onGetVehicleList(status, '', '', 1, false));
+    dispatch(onGetVehicleList(status, '', '', 1, false, ''));
   }
   const translateX = useSharedValue(0);
 
@@ -118,7 +119,7 @@ export default function Orders({navigation}: OrdersProps) {
   }
 
   function onRefresh() {
-    dispatch(onGetVehicleList(activeStatus, '', '', 1, false));
+    dispatch(onGetVehicleList(activeStatus, '', '', 1, false, ''));
   }
 
   return (

@@ -152,12 +152,10 @@ export default function Login({navigation}: LoginProps) {
   }
 
   function _onReceiveSms(event: {message: string}) {
-    const regex = /\b(\d{6}\s[A-Za-z0-9]{10,})\b/;
+    const regex = /\b(\d{6})\b/;
     const match = event.message.match(regex);
-
     if (match) {
-      const otpWithLetters = match[1];
-      const numericOTP = otpWithLetters.split(' ')[0];
+      const numericOTP = match[1];
       setPassword(numericOTP);
       setIsAuto(false);
     }

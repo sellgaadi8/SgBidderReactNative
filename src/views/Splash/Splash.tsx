@@ -10,6 +10,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import colors from '../../utils/colors';
+import {SplashProps} from '../../types/propTypes';
 
 export default function Splash({navigation}: SplashProps) {
   const {setAuthenticated} = useContext(GlobalContext);
