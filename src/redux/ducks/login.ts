@@ -38,10 +38,10 @@ export const onLogin =
     isOtp: boolean,
     password: string,
   ) =>
-  (dispatch: AppDispatch) => {
+  async (dispatch: AppDispatch) => {
     const url = LOGIN_SUBMIT;
 
-    const token = messaging().getToken();
+    const token = await messaging().getToken();
     console.log('token=>>>>>', token);
 
     const body = JSON.stringify({

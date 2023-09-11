@@ -6,4 +6,5 @@ type AppContext = {
   userPhone: string;
   isFirstTime: boolean;
   userName: string;
+  vehicleId: string;
 };

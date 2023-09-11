@@ -23,6 +23,9 @@ import SuccessPage from './src/views/Explore/SuccessPage';
 import messaging from '@react-native-firebase/messaging';
 import ImageSection from './src/views/Explore/ImageSection';
 import Notification from './src/views/Notification/Notification';
+import {PermissionsAndroid} from 'react-native';
+import PushNotification from 'react-native-push-notification';
+import {navigationRef} from './src/navigation/navigate';
 
 export default function App() {
   const RootStack = createStackNavigator();
@@ -30,7 +33,89 @@ export default function App() {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [userPhone, setUserPhone] = useState('');
   const [userName, setUseName] = useState('');
+  const [vehicleId, setVehicleId] = useState('');
   const selectLogoutState = useAppSelector(state => state.logout);
+
+  useEffect(() => {
+    PushNotification.configure({
+      onNotification: function (notification) {
+        const {click_to_action} = notification.data;
+        const clickToActionString = click_to_action;
+        const clickToAction = JSON.parse(clickToActionString);
+
+        if (notification.foreground) {
+          // Handle notification when app is in foreground
+        } else {
+          if (clickToAction) {
+            let route: keyof RootStackParamList = 'ExploreStack';
+            let params: any = {};
+
+            switch (clickToAction.page) {
+              case 'details_page':
+                route = 'VehicleDetail';
+                params.uuid = clickToAction.id;
+                setVehicleId(clickToAction.id);
+
+                break;
+              case 'deal_won_page':
+                route = 'OrderStack';
+                params.uuid = clickToAction.id;
+                params.activeindex = 1;
+                break;
+              case 'in_negotiation_page':
+                route = 'OrderStack';
+                params.uuid = clickToAction.id;
+                break;
+              case 'explore_page':
+                route = 'ExploreStack';
+                params.uuid = clickToAction.id;
+                break;
+            }
+            navigationRef.current?.navigate(route, {
+              from: 'NOTIFICATIONS',
+              ...params,
+            });
+          }
+        }
+        PushNotification.removeAllDeliveredNotifications();
+      },
+      popInitialNotification: true,
+    });
+  }, []);
+
+  useEffect(() => {
+    async function requestNotificationPermission() {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          {
+            title: 'Notification Permission',
+            message: 'Your app needs permission to send notifications.',
+            buttonPositive: 'OK',
+          },
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Notification permission granted');
+        } else {
+          console.log('Notification permission denied');
+        }
+      } catch (error) {
+        console.error('Error requesting notification permission:', error);
+      }
+    }
+
+    requestNotificationPermission();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // Handle the incoming message here
+      console.log('remoteForegrounMsg', remoteMessage);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const getFirebaseToken = async () => {
     const token = await messaging().getToken();
@@ -74,9 +159,10 @@ export default function App() {
         isFirstTime,
         userName,
         setUseName,
+        vehicleId,
       }}>
       <SafeAreaView style={styles.container}>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <RootStack.Navigator>
             {!authenticated ? (
               <>

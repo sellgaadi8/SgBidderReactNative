@@ -8,6 +8,7 @@ const GlobalContext = React.createContext<AppContext>({
   userPhone: '',
   isFirstTime: false,
   userName: '',
+  vehicleId: '',
 });
 
 export default GlobalContext;

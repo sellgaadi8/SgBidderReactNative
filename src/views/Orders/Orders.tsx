@@ -61,6 +61,7 @@ export default function Orders({navigation}: OrdersProps) {
     // return () => {
     //   navigation.removeListener('focus', onFocus);
     // };
+
     onFocus();
   }, []);
 

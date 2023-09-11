@@ -11,7 +11,7 @@ export default function Notification() {
       <Notifications
         data={{
           btn_label: 'Click Me',
-          click_action: 'Hello',
+          click_to_action: 'Hello',
           created_at: '12/10/2002',
           message: 'Hello RIshabh Jain',
           title: 'Bidder APP',

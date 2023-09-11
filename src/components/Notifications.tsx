@@ -8,7 +8,7 @@ import {formatDate, truncateString} from '../utils/helper';
 import {NotificationProps} from '../types/propTypes';
 
 export default function Notifications({
-  data: {title, message, click_action, created_at, btn_label},
+  data: {title, message, click_to_action, created_at, btn_label},
 }: NotificationProps) {
   const [read, setRead] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
@@ -36,7 +36,7 @@ export default function Notifications({
           <CustomText fontSize={14} color="#4B4B4B" lineHeight={20}>
             {truncateString(message, collapsed ? undefined : 42)}
           </CustomText>
-          {click_action !== '' && collapsed && (
+          {click_to_action !== '' && collapsed && (
             <TouchableOpacity onPress={() => onClickCta()}>
               <CustomText
                 color="Primary"

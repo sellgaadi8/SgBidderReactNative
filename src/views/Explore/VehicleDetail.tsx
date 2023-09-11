@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import {useDispatch} from 'react-redux';
 import Box from '../../components/Box';
@@ -30,6 +30,7 @@ import BidWindow from '../../components/BidWindow';
 import {onPlaceVehicleBid} from '../../redux/ducks/placebid';
 import Indicator from '../../components/Indicator';
 import {isNumberValid} from '../../utils/regex';
+import GlobalContext from '../../contexts/GlobalContext';
 const {height, width} = Dimensions.get('window');
 
 export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
@@ -48,7 +49,6 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   const selectOcb = useAppSelector(state => state.oneClickBuy);
   const selectOnBid = useAppSelector(state => state.placebid);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [interiorImage, setInteriorImage] = useState('');
   const [damagesImage, setDamagesImage] = useState<
     | string
     | {
@@ -158,6 +158,7 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
   }>();
   const [loading, setLoading] = useState(false);
   // const [scrollIndex, setScrollIndex] = useState(0);
+  const {vehicleId} = useContext(GlobalContext);
 
   function onChangeTab(index: number) {
     setActiveIndex(index);
@@ -208,7 +209,9 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
 
   useEffect(() => {
     setLoading(true);
-    dispatch(onGetVehicleDetails(route.params.vehicleId));
+    dispatch(
+      onGetVehicleDetails(vehicleId ? vehicleId : route.params.vehicleId),
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -219,9 +222,11 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
       const {data, success, error} = selectVehicleDetails;
 
       if (success && !error && data) {
-        let obj = Object.keys(data.damages_images_section)[0];
-        console.log('====?>', data.damages_images_section[obj]);
-        setDamagesImage(data.damages_images_section[obj]);
+        if (data.damages_images_section) {
+          let obj = Object.keys(data.damages_images_section)[0];
+          console.log('====?>', data.damages_images_section[obj]);
+          setDamagesImage(data.damages_images_section[obj]);
+        }
         const updatedTabs = [...tabs];
         const updatedTwoWheelerTab = [...twoWheelerTab];
         for (const key in data) {
@@ -248,7 +253,6 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
 
         setVehicleDetails(data);
         if (data.car_images) {
-          setInteriorImage(data.car_images.interior_dashboard);
           setVehicleImage(Object.values(data.car_images));
         }
 

@@ -28,7 +28,7 @@ type RootStackParamList = {
     index: number;
   };
   SuccessPage: {msg: string};
-  OrderStack: {activeIndex: number};
+  OrderStack: {activeIndex: number; uuid: string};
   ProfileStack: undefined;
   ImageSection: {
     exterior:
