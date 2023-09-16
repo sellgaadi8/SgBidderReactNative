@@ -25,7 +25,7 @@ const cityAction = (res: CityState): CityAction => {
   return {type: CITY, payload: {...res, called: true}};
 };
 
-export const getCityList = () => async (dispatch: AppDispatch) => {
+export const getCityLists = () => async (dispatch: AppDispatch) => {
   const url = CITY_LIST;
 
   axiosInstance

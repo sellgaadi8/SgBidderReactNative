@@ -9,6 +9,7 @@ type Profile = {
   business_pan: string;
   aadhar_no: string;
   email: string;
+  city: string;
 };
 
 type GetProfileState = {

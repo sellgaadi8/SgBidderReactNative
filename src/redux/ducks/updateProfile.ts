@@ -37,6 +37,7 @@ export const onUpdateProfile =
     aadhar_no: string,
     email: string,
     address: string,
+    city: string,
   ) =>
   async (dispatch: AppDispatch) => {
     const url = UPDATE_PROFILE;
@@ -56,6 +57,7 @@ export const onUpdateProfile =
     body.append('pan_no', pan_no);
     body.append('aadhar_no', aadhar_no);
     body.append('email', email);
+    body.append('city', city);
 
     axiosInstance
       .post(url, body, config)

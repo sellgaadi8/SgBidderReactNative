@@ -16,4 +16,9 @@ type PasswordErrors = {
 type EditProfileErrors = {
   name?: string;
   email?: string;
+  gst?: string;
+  adhar?: string;
+  address1?: string;
+  pan?: string;
+  city?: string;
 };
