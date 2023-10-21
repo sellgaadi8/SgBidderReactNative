@@ -43,3 +43,18 @@ export function isNumberValid(value: string) {
   const re = /^([1-9][0-9]*)$/;
   return re.test(value.trim());
 }
+
+export function validatePAN(panNumber: any) {
+  const panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+  return panPattern.test(panNumber);
+}
+
+export function validateAadhar(aadharNumber: string) {
+  const aadharPattern = /^\d{12}$/;
+  return aadharPattern.test(aadharNumber);
+}
+
+export function validateGst(gst: any) {
+  const gstPattern = /^\d{2}[A-Z]{5}\d{4}[A-Z]\d{1}[Z]{1}\d{1}$/;
+  return gstPattern.test(gst);
+}

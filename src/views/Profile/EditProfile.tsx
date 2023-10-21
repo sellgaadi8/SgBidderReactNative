@@ -24,7 +24,13 @@ import Input from '../../components/Input';
 import GlobalContext from '../../contexts/GlobalContext';
 import {onUpdateProfile} from '../../redux/ducks/updateProfile';
 import {useAppSelector} from '../../utils/hook';
-import {isEmailValid, isNameValid} from '../../utils/regex';
+import {
+  isEmailValid,
+  isNameValid,
+  validateAadhar,
+  validateGst,
+  validatePAN,
+} from '../../utils/regex';
 import {EditProfileProps} from '../../types/propTypes';
 import {onGetProfile} from '../../redux/ducks/getProfile';
 import {getCityLists} from '../../redux/ducks/getCity';
@@ -56,8 +62,9 @@ export default function EditProfile({navigation}: EditProfileProps) {
   const selectCity = useAppSelector(state => state.getCity);
 
   useEffect(() => {
-    dispatch(getCityLists());
+    setLoading(true);
     dispatch(onGetProfile());
+    dispatch(getCityLists());
     setPhone(userPhone);
   }, []);
 
@@ -72,17 +79,19 @@ export default function EditProfile({navigation}: EditProfileProps) {
     if (!isEmailValid(email)) {
       tempErrors.email = 'Enter a valid email address';
     }
-    if (gst.length === 0) {
-      tempErrors.gst = 'Enter a gst number';
+    if (!validateGst(gst)) {
+      tempErrors.gst = 'Enter valid GST number';
     }
     if (adhar.length === 0) {
-      tempErrors.adhar = 'Enter aadhar number';
+      tempErrors.adhar = 'Enter Adhar number';
+    } else if (!validateAadhar(adhar)) {
+      tempErrors.adhar = 'Enter valid Adhar number';
     }
     if (address1.length === 0) {
       tempErrors.address1 = 'Enter Address';
     }
-    if (pan.length === 0) {
-      tempErrors.pan = 'Enter a pan number';
+    if (!validatePAN(pan)) {
+      tempErrors.pan = 'Enter valid PAN number';
     }
     if (city.length === 0) {
       tempErrors.city = 'Select city';
@@ -96,7 +105,7 @@ export default function EditProfile({navigation}: EditProfileProps) {
     Keyboard.dismiss();
     if (isValid) {
       setLoading(true);
-      dispatch(onUpdateProfile(name, gst, pan, adhar, email, address1, city));
+      dispatch(onUpdateProfile(name, gst, pan, adhar, email, address1, cityId));
     }
   }
 
@@ -118,11 +127,14 @@ export default function EditProfile({navigation}: EditProfileProps) {
       }
     }
     if (selectGetProfile.called) {
+      setLoading(false);
       const {data, success} = selectGetProfile;
       if (success && data) {
         if (data.dealership_name) {
           setName(data.dealership_name);
         }
+        setCityId(data.city);
+
         setPhone(data.mobile);
         if (data.email) {
           setEmail(data.email);
@@ -139,19 +151,24 @@ export default function EditProfile({navigation}: EditProfileProps) {
         if (data.business_pan) {
           setPan(data.business_pan);
         }
-        if (data.city) {
-          setCityId(data.city);
-        }
       }
     }
     if (selectCity.called) {
+      setLoading(false);
       const {error, data} = selectCity;
       if (!error && data) {
         setCityData(data);
         setModalData(data);
       }
     }
-  }, [selectProfileUpate, selectGetProfile]);
+  }, [selectProfileUpate, selectGetProfile, selectCity]);
+
+  useEffect(() => {
+    const matchingCity = cityData.find(cityObj => cityObj.id === cityId);
+    if (matchingCity) {
+      setCity(matchingCity.city);
+    }
+  }, [cityData]);
 
   function onChangeQuery(query: string) {
     setSearchQuery(query);
@@ -180,6 +197,18 @@ export default function EditProfile({navigation}: EditProfileProps) {
     setCity(item.city);
     setShowModal(false);
   }
+
+  const handlePanNumberChange = (text: string) => {
+    // Convert the input to uppercase
+    text = text.toUpperCase();
+    setPan(text);
+  };
+
+  const handleGstChange = (text: string) => {
+    // Convert the input to uppercase
+    text = text.toUpperCase();
+    setGst(text);
+  };
 
   function renderItem({item}: ListRenderItemInfo<City>) {
     return (
@@ -246,7 +275,7 @@ export default function EditProfile({navigation}: EditProfileProps) {
         <Input
           label="GST number"
           value={gst}
-          onChangeText={setGst}
+          onChangeText={handleGstChange}
           maxLength={15}
           error={errors?.gst}
           noMargin
@@ -255,7 +284,7 @@ export default function EditProfile({navigation}: EditProfileProps) {
         <Input
           label="Pan number"
           value={pan}
-          onChangeText={setPan}
+          onChangeText={handlePanNumberChange}
           maxLength={10}
           error={errors?.pan}
           noMargin
@@ -270,25 +299,10 @@ export default function EditProfile({navigation}: EditProfileProps) {
           error={errors?.adhar}
           noMargin
         />
-        {/* {isFirstTime ? (
-          <Box style={[styles.buttonContainer]}>
-            <Box width={'45%'}>
-              <PrimaryButton label="Update" onPress={update} />
-            </Box>
 
-            <Box width={'45%'} ph={'1%'}>
-              <PrimaryButton
-                label="Skip"
-                onPress={onSkip}
-                varient="Secondary"
-              />
-            </Box>
-          </Box>
-        ) : ( */}
         <Box width={'45%'} alignSelf="center" pv={'5%'}>
           <PrimaryButton label="Update" onPress={update} />
         </Box>
-        {/* )} */}
       </ScrollView>
       <Modal
         isOpen={showModal}
