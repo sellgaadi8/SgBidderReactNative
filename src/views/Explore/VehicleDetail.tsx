@@ -391,24 +391,32 @@ export default function VehicleDetail({route, navigation}: VehicleDetailProps) {
     setAmount(value.toString());
   }
 
-  function onSubmitBid(value: string) {
+  function onSubmitBid(value: string, expectedVal: string) {
     const result = (20 / 100) * Number(value);
-    if (isNumberValid(amount)) {
-      if (+amount >= result) {
-        dispatch(onPlaceVehicleBid(id, amount));
+    if (+amount > +expectedVal) {
+      Snackbar.show({
+        text: 'Bid amount should not greater then Expected price',
+        backgroundColor: 'red',
+        duration: Snackbar.LENGTH_SHORT,
+      });
+    } else {
+      if (isNumberValid(amount)) {
+        if (+amount >= result) {
+          dispatch(onPlaceVehicleBid(id, amount));
+        } else {
+          Snackbar.show({
+            text: `Bid amount should be greater then ${result}`,
+            backgroundColor: 'red',
+            duration: Snackbar.LENGTH_SHORT,
+          });
+        }
       } else {
         Snackbar.show({
-          text: `Bid amount should be greater then ${result}`,
+          text: 'Enter valid bid amount',
           backgroundColor: 'red',
           duration: Snackbar.LENGTH_SHORT,
         });
       }
-    } else {
-      Snackbar.show({
-        text: 'Enter valid bid amount',
-        backgroundColor: 'red',
-        duration: Snackbar.LENGTH_SHORT,
-      });
     }
   }
 

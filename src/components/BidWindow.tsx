@@ -242,7 +242,9 @@ export default function BidWindow(props: BidWindowProps & TextInputProps) {
             <Box pv={'5%'} alignItems="center">
               <PrimaryButton
                 label="Place bid"
-                onPress={() => onPlaceBid(data.auction_value)}
+                onPress={() =>
+                  onPlaceBid(data.auction_value, data.auction_value)
+                }
               />
             </Box>
           </Box>
