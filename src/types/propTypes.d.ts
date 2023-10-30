@@ -271,7 +271,7 @@ type EditProfileProps = {
 
 type BidWindowProps = {
   data: Vehicle;
-  onPlaceBid: (value: string, expected: string) => void;
+  onPlaceBid: (value: string) => void;
   onPlus: () => void;
   onMinus: () => void;
   onClose: () => void;
