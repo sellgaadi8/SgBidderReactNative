@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://3.110.1.47/api';
+const BASE_URL = 'https://api.sellgaadi.com/api'; //'http://3.110.1.47/api';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
